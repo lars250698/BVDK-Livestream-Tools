@@ -2,7 +2,9 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import activeAthleteHtml from '../../resources/html/index.html?raw'
 import express from 'express'
+import cors from 'cors'
 
 function createWindow() {
   // Create the browser window.
@@ -40,6 +42,7 @@ function createWindow() {
 
 function startExpress(window) {
   const app = express()
+  app.use(cors())
 
   app.get('/active-athlete', (req, res) => {
     window.webContents.send('active-athlete')
@@ -56,6 +59,10 @@ function startExpress(window) {
     ipcMain.once(`scoreboard-${req.params.category}-response`, (e, msg) => {
       res.send(msg)
     })
+  })
+
+  app.get('/stream/active-athlete', (req, res) => {
+    res.send(activeAthleteHtml)
   })
 
   app.listen(8000)
