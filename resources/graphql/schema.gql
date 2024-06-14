@@ -1,0 +1,649 @@
+enum AttemptStatus {
+  open
+  valid
+  invalid
+  skip
+  repeat
+}
+
+enum BenchPressBlocks {
+  yes
+  no
+}
+
+enum BenchPressLiftIn {
+  yes
+  no
+}
+
+type BodyWeightCategory {
+  id: ID!
+  name: String!
+  alias: String!
+  gender: String!
+  from: String!
+  to: String!
+  description: String
+}
+
+type BodyWeightCategoryList {
+  total: Int
+  bodyWeightCategories: [BodyWeightCategory]
+}
+
+type Club {
+  id: ID!
+  insert: String!
+  update: String!
+  name: String!
+}
+
+type Competition {
+  id: ID!
+  insert: String!
+  update: String!
+  type: String!
+  name: String!
+  discipline: EventDiscipline
+  equipment: EventEquipment
+  eventList: EventList
+  competitionAthleteList(
+    params: CompetitionAthleteListParams = { sort: {} }
+  ): CompetitionAthleteList
+  eventAgeCategoryList: EventAgeCategoryList
+  eventBodyWeightCategoryList(
+    params: EventBodyWeightCategoryListParams = {}
+  ): EventBodyWeightCategoryList
+  competitionGroupList(params: CompetitionGroupListParams): CompetitionGroupList
+  userList: UserList
+  active: Boolean!
+}
+
+type CompetitionAthlete {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  competition: Competition!
+  event: Event!
+  club: Club!
+  team: CompetitionTeam
+  gender: Gender!
+  lot: Int
+  bodyWeight: Float
+  ageCategory: EventAgeCategory!
+  bodyWeightCategory: EventBodyWeightCategory!
+  registrationTotal: Float
+  competitionGroup: CompetitionGroup
+  competitionAthleteAttempts: [CompetitionAthleteAttempt]
+  squatRackHeight: Int
+  squatRackSetup: SquatRackSetup
+  squatTotal: Float
+  benchPressRackHeight: Int
+  benchPressSafetyHeight: Int
+  benchPressLiftIn: BenchPressLiftIn
+  benchPressBlocks: BenchPressBlocks
+  benchPressTotal: Float
+  deadliftTotal: Float
+  calcTotal: Float
+  total: Float
+  out: Boolean
+  points: Float
+  locked: Boolean!
+}
+
+type CompetitionAthleteAttempt {
+  id: ID!
+  competitionAthlete: CompetitionAthlete!
+  index: String!
+  discipline: Discipline!
+  attempt: Int!
+  weight: Float
+  status: AttemptStatus!
+}
+
+type CompetitionAthleteAttemptList {
+  total: Int
+  competitionAthleteAttempts: [CompetitionAthleteAttempt]
+}
+
+input CompetitionAthleteAttemptListFilter {
+  withBodyWeight: Boolean
+  competitionGroupId: [ID]
+  competitionStageId: ID
+  competitionBodyWeightCategoryId: [ID]
+}
+
+input CompetitionAthleteAttemptListParams {
+  start: Int
+  limit: Int
+  filter: CompetitionAthleteAttemptListFilter
+}
+
+input CompetitionAthleteAttemptUpdate {
+  discipline: Discipline
+  attempt: Int
+  weight: Float
+  status: AttemptStatus
+}
+
+type CompetitionAthleteList {
+  total: Int
+  competitionAthletes: [CompetitionAthlete]
+}
+
+input CompetitionAthleteListFilter {
+  competitionId: [ID]
+  gender: [Gender]
+  withBodyWeight: Boolean
+  bodyWeightCategoryId: [ID]
+  eventBodyWeightCategoryId: [ID]
+  eventAgeCategoryId: [ID]
+  withoutCompetitionGroup: Boolean
+  withoutCompetitionGroupId: ID
+  competitionStageId: ID
+  competitionGroupId: ID
+  competitionTeamId: [ID]
+}
+
+input CompetitionAthleteListParams {
+  start: Int
+  limit: Int
+  sort: CompetitionAthleteListSort
+  filter: CompetitionAthleteListFilter
+  search: CompetitionAthleteListSearch
+}
+
+input CompetitionAthleteListSearch {
+  query: String
+}
+
+input CompetitionAthleteListSort {
+  name: Direction
+  insert: Direction
+  attempt: Direction
+  points: Direction
+}
+
+input CompetitionAthleteUpdate {
+  lot: Int!
+  bodyWeight: Float!
+  squatRackHeight: Int
+  squatRackSetup: SquatRackSetup
+  benchPressRackHeight: Int
+  benchPressSafetyHeight: Int
+  benchPressLiftIn: BenchPressLiftIn
+  benchPressBlocks: BenchPressBlocks
+  competitionAthleteAttempts: [CompetitionAthleteAttemptUpdate]
+}
+
+type CompetitionClub {
+  id: ID!
+  name: String!
+}
+
+type CompetitionClubList {
+  total: Int
+  competitionClubs: [CompetitionClub]
+}
+
+type CompetitionGroup {
+  id: ID!
+  insert: String!
+  update: String!
+  name: String!
+  description: String
+  sortId: Int!
+  active: Boolean!
+  locked: Boolean!
+  finished: Boolean!
+  competitionAthleteList(
+    relatedCompetitionGroups: Boolean
+    params: CompetitionAthleteListParams = { sort: {} }
+  ): CompetitionAthleteList
+  eventBodyWeightCategoryList: EventBodyWeightCategoryList
+  competitionAthleteAttemptList: CompetitionAthleteAttemptList
+  competitionStage: CompetitionStage
+}
+
+input CompetitionGroupCreate {
+  name: String!
+  description: String
+  eventBodyWeightCategoryIds: [ID]
+  competitionStageId: ID!
+}
+
+type CompetitionGroupList {
+  total: Int
+  competitionGroups: [CompetitionGroup]
+}
+
+input CompetitionGroupListFilter {
+  competitionStageId: ID
+  active: Boolean
+}
+
+input CompetitionGroupListParams {
+  start: Int
+  limit: Int
+  sort: CompetitionGroupListSort
+  filter: CompetitionGroupListFilter
+}
+
+input CompetitionGroupListSort {
+  name: Direction
+  sortId: Direction
+}
+
+input CompetitionGroupUpdate {
+  name: String
+  description: String
+  active: Boolean
+  locked: Boolean
+  competitionStageId: ID
+}
+
+type CompetitionList {
+  total: Int
+  competitions: [Competition]
+}
+
+input CompetitionListParams {
+  start: Int
+  limit: Int
+  sort: CompetitionListSort
+}
+
+input CompetitionListSort {
+  name: Direction
+  insert: Direction
+}
+
+type CompetitionStage {
+  id: ID!
+  insert: String!
+  update: String!
+  name: String!
+  competitionClub: CompetitionClub!
+}
+
+input CompetitionStageInput {
+  name: String
+  clubId: ID
+}
+
+type CompetitionStageList {
+  total: Int
+  competitionStages: [CompetitionStage]
+}
+
+input CompetitionStageListParams {
+  start: Int
+  limit: Int
+  sort: CompetitionStageListSort
+}
+
+input CompetitionStageListSort {
+  name: Direction
+  insert: Direction
+}
+
+type CompetitionTeam {
+  id: ID!
+  insert: String!
+  update: String!
+  name: String!
+  points: Float
+  event: Event!
+  athletes: [CompetitionAthlete]!
+  host: Club
+  teamConfiguration: CompetitionTeamConfiguration!
+}
+
+type CompetitionTeamConfiguration {
+  id: ID!
+  insert: String!
+  update: String!
+  name: String!
+  gender: CompetitionTeamGender!
+  athleteCount: Int!
+  athleteResultCount: Int!
+  guestCount: Int!
+}
+
+enum CompetitionTeamGender {
+  male
+  female
+  mixed
+}
+
+type CompetitionTeamList {
+  total: Int
+  competitionTeams: [CompetitionTeam]
+}
+
+input CompetitionUpdate {
+  name: String
+}
+
+type CompetitionUser {
+  id: ID!
+  insert: String!
+  update: String!
+  name: String!
+  username: String!
+  password: String!
+  expires: String!
+  role: CompetitionUserRole!
+  resourceList: ResourceList
+}
+
+input CompetitionUserCreate {
+  name: String!
+  role: CompetitionUserRole!
+  expires: String
+}
+
+type CompetitionUserList {
+  total: Int
+  competitionUsers: [CompetitionUser]
+}
+
+enum CompetitionUserRole {
+  competitionUserAdmin
+  competitionUserWeightIn
+  competitionUserLiveStream
+  competitionUserResultList
+  competitionUserSpotter
+}
+
+enum Direction {
+  ASC
+  DESC
+}
+
+enum Discipline {
+  squat
+  benchPress
+  deadlift
+}
+
+enum ErrorType {
+  error
+  exit
+  internalServerError
+}
+
+type Event {
+  id: ID!
+  insert: String!
+  update: String!
+  date: String!
+  dateTo: String
+  name: String!
+  type: EventType!
+  discipline: EventDiscipline!
+  competition: Competition
+  equipment: EventEquipment!
+  parent: Event
+  location: String
+}
+
+type EventAgeCategory {
+  id: ID!
+  name: String!
+  alias: String!
+  from: String!
+  to: String!
+  description: String
+  sortId: Int
+}
+
+type EventAgeCategoryList {
+  total: Int
+  eventAgeCategories: [EventAgeCategory]
+}
+
+input EventAgeCategoryListFilter {
+  gender: [Gender]
+  eventBodyWeightCategoryId: [ID]
+  competitionId: [ID]
+}
+
+input EventAgeCategoryListParams {
+  start: Int
+  limit: Int
+  sort: EventAgeCategoryListSort
+  filter: EventAgeCategoryListFilter
+}
+
+input EventAgeCategoryListSort {
+  name: Direction
+  insert: Direction
+}
+
+type EventBodyWeightCategory {
+  id: ID!
+  name: String!
+  alias: String!
+  gender: String!
+  from: String!
+  to: String!
+  description: String
+  eventAgeCategory: EventAgeCategory!
+  event: Event!
+}
+
+type EventBodyWeightCategoryList {
+  total: Int
+  eventBodyWeightCategories: [EventBodyWeightCategory]
+}
+
+input EventBodyWeightCategoryListFilter {
+  gender: [Gender]
+  eventAgeCategoryId: [ID]
+  competitionId: [ID]
+  competitionGroupId: [ID]
+}
+
+input EventBodyWeightCategoryListParams {
+  start: Int
+  limit: Int
+  filter: EventBodyWeightCategoryListFilter
+}
+
+enum EventDiscipline {
+  squat
+  benchPress
+  deadlift
+  total
+}
+
+enum EventEquipment {
+  raw
+  equipped
+}
+
+type EventList {
+  total: Int
+  events: [Event]
+}
+
+input EventListFilter {
+  eventId_nin: [ID]
+  parentEventId_nin: [ID]
+  competitionId: ID
+  hasActiveCompetitions: Boolean
+  stateAssociationId: [ID]
+  type: [EventType]
+  date_gt: String
+  date_gte: String
+  date_lt: String
+  date_lte: String
+}
+
+input EventListParams {
+  start: Int
+  limit: Int
+  filter: EventListFilter
+  sort: EventListSort
+  search: EventListSearch
+}
+
+input EventListSearch {
+  query: String
+}
+
+input EventListSort {
+  name: Direction
+  insert: Direction
+  date: Direction
+}
+
+enum EventType {
+  default
+  single
+  team
+}
+
+enum Gender {
+  male
+  female
+}
+
+type Mutation {
+  addEventToCompetition(competitionId: ID!, eventId: ID!): Response
+  removeEventFromCompetition(competitionId: ID!, eventId: ID!): Response
+  createCompetition(name: String!): Competition
+  updateCompetition(competitionId: ID!, input: CompetitionUpdate): Competition
+  deleteCompetition(competitionId: ID!): Response
+  updateCompetitionAthlete(
+    competitionAthleteId: ID!
+    input: CompetitionAthleteUpdate
+  ): CompetitionAthlete
+  createCompetitionUser(competitionId: ID!, input: CompetitionUserCreate!): CompetitionUser
+  deleteCompetitionUser(userId: ID!): Response
+  generateCompetitionGroupLotNumbers(competitionGroupId: ID!): Response
+  generateCompetitionGroups(competitionId: ID!): Response
+  createCompetitionGroup(competitionId: ID!, input: CompetitionGroupCreate!): CompetitionGroup
+  updateCompetitionGroup(competitionGroupId: ID!, input: CompetitionGroupUpdate): CompetitionGroup
+  updateCompetitionGroupRank(
+    competitionGroupId: ID!
+    competitionGroupBeforeId: ID
+    competitionGroupAfterId: ID
+  ): Response
+  deleteCompetitionGroup(competitionGroupId: ID!): Response
+  addCompetitionAthletesToCompetitionGroup(
+    competitionGroupId: ID!
+    competitionAthleteIds: [ID]!
+  ): Response
+  removeCompetitionAthletesFromCompetitionGroup(
+    competitionGroupId: ID!
+    competitionAthleteId: [ID]!
+  ): Response
+  createCompetitionStage(competitionId: ID!, input: CompetitionStageInput!): CompetitionStage
+  updateCompetitionStage(competitionStageId: ID!, input: CompetitionStageInput): CompetitionStage
+  deleteCompetitionStage(competitionStageId: ID!): Response
+  updateCompetitionAthleteAttempt(
+    competitionAthleteAttemptId: ID!
+    input: CompetitionAthleteAttemptUpdate
+  ): CompetitionAthleteAttempt
+}
+
+type Profile {
+  id: ID!
+  insert: String!
+  update: String!
+  email: String!
+  firstName: String!
+  lastName: String!
+  resourceList: ResourceList
+  competition: Competition
+}
+
+type Query {
+  stateAssociationList: StateAssociationList
+  stateAssociation(stateAssociationId: ID!): StateAssociation
+  error(type: ErrorType): Response
+  profile: Profile
+  bodyWeightCategoryList: BodyWeightCategoryList
+  competition(competitionId: ID!): Competition
+  competitionAthlete(competitionAthleteId: ID!): CompetitionAthlete
+  competitionAthleteAttemptList(
+    competitionId: ID!
+    params: CompetitionAthleteAttemptListParams
+  ): CompetitionAthleteAttemptList
+  competitionAthleteList(
+    competitionId: ID!
+    params: CompetitionAthleteListParams
+  ): CompetitionAthleteList
+  competitionClubList(competitionId: ID!): CompetitionClubList
+  competitionGroup(competitionGroupId: ID!): CompetitionGroup
+  competitionGroupList(competitionId: ID!, params: CompetitionGroupListParams): CompetitionGroupList
+  competitionList(params: CompetitionListParams): CompetitionList
+  competitionStage(competitionStageId: ID!): CompetitionStage
+  competitionStageList(competitionId: ID!, params: CompetitionStageListParams): CompetitionStageList
+  competitionTeamList(competitionId: ID!): CompetitionTeamList
+  competitionUserList(competitionId: ID!): CompetitionUserList
+  eventList(params: EventListParams): EventList
+  event(eventId: ID!): Event
+  eventAgeCategoryList(params: EventAgeCategoryListParams): EventAgeCategoryList
+  eventBodyWeightCategoryList(
+    params: EventBodyWeightCategoryListParams
+  ): EventBodyWeightCategoryList
+}
+
+type ResourceList {
+  total: Int
+  resources: [String]
+}
+
+type Response {
+  success: Boolean!
+  message: String!
+}
+
+type Role {
+  id: ID!
+  insert: String!
+  update: String!
+  name: String!
+}
+
+type RoleList {
+  total: Int
+  roles: [Role]
+}
+
+enum SquatRackSetup {
+  outside
+  inside
+  leftInside
+  rightInside
+}
+
+type StateAssociation {
+  id: ID!
+  insert: String!
+  update: String!
+  name: String!
+}
+
+type StateAssociationList {
+  total: Int
+  stateAssociations: [StateAssociation]
+}
+
+type User {
+  id: ID!
+  insert: String!
+  update: String!
+  email: String!
+  firstName: String!
+  lastName: String!
+  roleList: RoleList
+}
+
+type UserList {
+  total: Int
+  users: [User]
+}

@@ -1,0 +1,33 @@
+query activeAthleteQuery($competitionId: ID!, $params: CompetitionAthleteAttemptListParams) {
+  competitionAthleteAttemptList(competitionId: $competitionId, params: $params) {
+    competitionAthleteAttempts {
+      discipline
+      competitionAthlete {
+        id
+        firstName
+        lastName
+        total
+        calcTotal
+        squatTotal
+        benchPressTotal
+        deadliftTotal
+        club {
+          name
+        }
+        ageCategory {
+          name
+        }
+        bodyWeightCategory {
+          id
+          name
+        }
+        competitionAthleteAttempts {
+          weight
+          status
+          discipline
+          attempt
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+query stageListQuery($competitionId: ID!) {
+  competitionStageList(competitionId: $competitionId) {
+    competitionStages {
+      id
+      name
+    }
+  }
+}

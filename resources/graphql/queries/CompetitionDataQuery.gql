@@ -1,0 +1,29 @@
+query competitionDataQuery($competitionId: ID!) {
+  competition(competitionId: $competitionId) {
+    eventBodyWeightCategoryList {
+      eventBodyWeightCategories {
+        id
+        name
+        eventAgeCategory {
+          name
+        }
+      }
+    }
+    competitionGroupList {
+      competitionGroups {
+        id
+        name
+        description
+        eventBodyWeightCategoryList {
+          eventBodyWeightCategories {
+            id
+            name
+            eventAgeCategory {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+}
