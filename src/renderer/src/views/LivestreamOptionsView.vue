@@ -12,6 +12,7 @@ import {
 } from '../vportal/stream-data'
 import { useToast } from 'vue-toastification'
 import defaultTemplate from '../../../../examples/templates/lower-thirds.mustache?raw'
+import Loading from 'vue-loading-overlay'
 
 const store = useStore()
 const router = useRouter()
@@ -19,6 +20,7 @@ const toast = useToast()
 const state = computed(() => store.state.applicationState)
 const gqlClient = store.state.gqlClient
 const customLowerThirdsTemplateFile = ref(null)
+const isLoading = ref(false)
 
 let customLowerThirdsTemplate = defaultTemplate
 let interval = null
@@ -58,6 +60,19 @@ function openCustomLowerThirds() {
     '_blank',
     'width=1400,height=180,nodeIntegration=no'
   )
+}
+
+function refreshStateWithLoadingIndicator() {
+  isLoading.value = true
+  refreshCompetitionData(gqlClient, state.value)
+    .then((newState) => {
+      store.commit('setApplicationState', newState)
+      isLoading.value = false
+    })
+    .catch((err) => {
+      toast.error('Error refreshing competition data')
+      console.error(err)
+    })
 }
 
 async function refreshState() {
@@ -191,6 +206,7 @@ onBeforeMount(() => {
       <div
         class="flex flex-col flex-shrink justify-start w-full h-full p-4 overflow-x-hidden overflow-y-auto bg-gray-900"
       >
+        <loading v-model:active="isLoading" :can-cancel="false" :is-full-page="false" />
         <h2 class="text-xl text-white px-4">Athleteneinblendung</h2>
 
         <!-- Competition Stage Selection -->
@@ -198,11 +214,7 @@ onBeforeMount(() => {
           <div class="settings-card">
             <div class="flex-col w-1/2">
               <h3 class="pb-2">Plattform</h3>
-              <select
-                v-model="state.selectedCompetitionStageId"
-                class="select"
-                @change="submitSelection()"
-              >
+              <select v-model="state.selectedCompetitionStageId" class="select">
                 <option
                   v-for="stage in state.availableCompetitionStages"
                   :key="stage.id"
@@ -249,10 +261,10 @@ onBeforeMount(() => {
                 </div>
                 <div class="w-14">
                   <input
+                    v-model="state.overallScoreboardSettings.pageSize"
                     class="input"
                     type="number"
-                    v-model="state.overallScoreboardSettings.pageSize"
-                    @change="refreshState"
+                    @change="refreshStateWithLoadingIndicator"
                   />
                 </div>
               </div>
@@ -266,7 +278,6 @@ onBeforeMount(() => {
                   <select
                     v-model="state.squatScoreboardSettings.selectedBodyWeightCategoryId"
                     class="select"
-                    @change="submitSelection()"
                   >
                     <template v-for="group in state.availableGroups">
                       <option
@@ -292,10 +303,10 @@ onBeforeMount(() => {
                 </div>
                 <div class="w-14">
                   <input
+                    v-model="state.squatScoreboardSettings.pageSize"
                     class="input"
                     type="number"
-                    v-model="state.squatScoreboardSettings.pageSize"
-                    @change="refreshState"
+                    @change="refreshStateWithLoadingIndicator"
                   />
                 </div>
               </div>
@@ -332,10 +343,10 @@ onBeforeMount(() => {
                 </div>
                 <div class="w-14">
                   <input
+                    v-model="state.benchPressScoreboardSettings.pageSize"
                     class="input"
                     type="number"
-                    v-model="state.benchPressScoreboardSettings.pageSize"
-                    @change="refreshState"
+                    @change="refreshStateWithLoadingIndicator"
                   />
                 </div>
               </div>
@@ -370,10 +381,10 @@ onBeforeMount(() => {
                 </div>
                 <div class="w-14">
                   <input
+                    v-model="state.deadliftScoreboardSettings.pageSize"
                     class="input"
                     type="number"
-                    v-model="state.deadliftScoreboardSettings.pageSize"
-                    @change="refreshState"
+                    @change="refreshStateWithLoadingIndicator"
                   />
                 </div>
               </div>
@@ -389,10 +400,10 @@ onBeforeMount(() => {
             <div class="flex flex-col w-96 py-4">
               <div class="flex flex-row">
                 <input
-                  class="file-upload mb-2"
                   id="custom-lower-thirds-input"
-                  type="file"
                   ref="customLowerThirdsTemplateFile"
+                  class="file-upload mb-2"
+                  type="file"
                   @change="handleFileUpload"
                 />
                 <button type="button" class="btn-secondary" @click="openCustomLowerThirds">

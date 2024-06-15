@@ -10,7 +10,14 @@ async function getOverallScoreboard(client, state) {
     state.competitionId,
     state.overallScoreboardSettings.selectedBodyWeightCategoryId
   )
-  return scoreboardData.competitionAthletes.map((athlete) => {
+  const offset =
+    state.overallScoreboardSettings.pageSize * (state.overallScoreboardSettings.page - 1)
+  const to = Math.min(
+    scoreboardData.competitionAthletes.length,
+    offset + state.overallScoreboardSettings.pageSize
+  )
+  const subset = scoreboardData.competitionAthletes.slice(offset, to)
+  return subset.map((athlete) => {
     return {
       name: `${athlete.firstName} ${athlete.lastName}`,
       lot: athlete.lot,
@@ -30,8 +37,13 @@ async function getSquatScoreboard(client, state) {
     state.competitionId,
     state.squatScoreboardSettings.selectedBodyWeightCategoryId
   )
-
-  return scoreboardData.competitionAthletes.map((athlete) => {
+  const offset = state.squatScoreboardSettings.pageSize * (state.squatScoreboardSettings.page - 1)
+  const to = Math.min(
+    scoreboardData.competitionAthletes.length,
+    offset + state.squatScoreboardSettings.pageSize
+  )
+  const subset = scoreboardData.competitionAthletes.slice(offset, to)
+  return subset.map((athlete) => {
     const attempts = filterAndSortAttempts(athlete.competitionAthleteAttempts, 'squat')
     return {
       name: `${athlete.firstName} ${athlete.lastName}`,
@@ -58,8 +70,14 @@ async function getBenchScoreboard(client, state) {
     state.competitionId,
     state.benchPressScoreboardSettings.selectedBodyWeightCategoryId
   )
-
-  return scoreboardData.competitionAthletes.map((athlete) => {
+  const offset =
+    state.benchPressScoreboardSettings.pageSize * (state.benchPressScoreboardSettings.page - 1)
+  const to = Math.min(
+    scoreboardData.competitionAthletes.length,
+    offset + state.benchPressScoreboardSettings.pageSize
+  )
+  const subset = scoreboardData.competitionAthletes.slice(offset, to)
+  return subset.map((athlete) => {
     const attempts = filterAndSortAttempts(athlete.competitionAthleteAttempts, 'benchPress')
     return {
       name: `${athlete.firstName} ${athlete.lastName}`,
@@ -87,8 +105,14 @@ async function getDeadliftScoreboard(client, state) {
     state.competitionId,
     state.deadliftScoreboardSettings.selectedBodyWeightCategoryId
   )
-
-  return scoreboardData.competitionAthletes.map((athlete) => {
+  const offset =
+    state.deadliftScoreboardSettings.pageSize * (state.deadliftScoreboardSettings.page - 1)
+  const to = Math.min(
+    scoreboardData.competitionAthletes.length,
+    offset + state.deadliftScoreboardSettings.pageSize
+  )
+  const subset = scoreboardData.competitionAthletes.slice(offset, to)
+  return subset.map((athlete) => {
     const attempts = filterAndSortAttempts(athlete.competitionAthleteAttempts, 'deadlift')
     return {
       name: `${athlete.firstName} ${athlete.lastName}`,
@@ -186,7 +210,7 @@ function getAttemptColor(attemptStatus) {
 }
 
 function getPlacement(athleteId, scoreboard) {
-  return scoreboard.competitionAthletes.map((athlete) => athlete.id).indexOf(athleteId)
+  return scoreboard.competitionAthletes.map((athlete) => athlete.id).indexOf(athleteId) + 1
 }
 
 function filterAndSortAttempts(attempts, discipline) {

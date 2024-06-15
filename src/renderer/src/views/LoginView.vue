@@ -18,13 +18,12 @@ const input = ref({
   credential: ''
 })
 const isLoading = ref(false)
-const vportalUrl = 'https://staging-bvdk.vportal-online.de'
 
 function login() {
   isLoading.value = true
   axios
-    .get(store.state.loginProxyUrl + '/vportal-auth-proxy', {
-      params: { username: input.value.identity, password: input.value.credential, url: vportalUrl }
+    .get(store.state.loginProxyUrl, {
+      params: { username: input.value.identity, password: input.value.credential, url: store.state.vportalUrl }
     })
     .then((res) => {
       store.commit('setToken', res.data.token)

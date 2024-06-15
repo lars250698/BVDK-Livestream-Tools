@@ -32,7 +32,7 @@ async function initState(client) {
       selectedBodyWeightCategoryId: defaultBodyWeightCategory,
       availablePages: defaultBodyWeightCategoryScoreboardPages,
       page: 1,
-      pageSize: defaultPageSize
+      pageSize: defaultPageSize,
     },
     benchPressScoreboardSettings: {
       selectedBodyWeightCategoryId: defaultBodyWeightCategory,
@@ -116,7 +116,15 @@ function getAvailableGroupsFromCompData(compData) {
 
 async function getAvailablePages(client, competitionId, categoryId, pageSize) {
   const res = await scoreboard(client, competitionId, categoryId)
-  return Math.floor(res.competitionAthletes.length / pageSize) + 1
+  if (res.competitionAthletes.length === 0) {
+    return 1
+  }
+  const pg = res.competitionAthletes.length / pageSize
+  if (pg % 1 === 0) {
+    return pg
+  } else {
+    return pg + 1
+  }
 }
 
 export { initState, refreshCompetitionData }

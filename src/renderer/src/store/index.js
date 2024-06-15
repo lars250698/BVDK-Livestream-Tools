@@ -7,8 +7,8 @@ let state = {
   token: null,
   gqlClient: null,
   applicationState: null,
-  vportalUrl: 'https://staging-bvdk.vportal-online.de',
-  loginProxyUrl: 'https://818wrx6ocb.execute-api.eu-central-1.amazonaws.com/default',
+  vportalUrl: 'https://bvdk.vportal-online.de',
+  loginProxyUrl: 'https://818wrx6ocb.execute-api.eu-central-1.amazonaws.com/default/vportal-auth-proxy',
   apiPort: 8000
 }
 

@@ -9,7 +9,7 @@ import Mustache from 'mustache'
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1300,
+    width: 1150,
     height: 900,
     minWidth: 1100,
     minHeight: 700,
