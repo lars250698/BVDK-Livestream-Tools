@@ -5,7 +5,11 @@ module.exports = {
     extend: {
       colors: {
         'bvdk-blue': '#00497f',
-        'bvdk-red': '#be0007'
+        'bvdk-red': '#be0007',
+        'magenta': '#ff00ff'
+      },
+      spacing: {
+        '128': '32rem',
       }
     }
   },
