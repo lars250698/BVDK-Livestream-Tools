@@ -3,6 +3,7 @@ import { activeAthlete, scoreboard } from './queries'
 const colorValid = '#00ff00ff'
 const colorInvalid = '#ff0000ff'
 const colorOpen = '#ffffff00'
+const colorInvisible = '#00000000'
 
 async function getOverallScoreboard(client, state) {
   const scoreboardData = await scoreboard(
@@ -17,18 +18,32 @@ async function getOverallScoreboard(client, state) {
     offset + state.overallScoreboardSettings.pageSize
   )
   const subset = scoreboardData.competitionAthletes.slice(offset, to)
-  return subset.map((athlete) => {
+  const res = subset.map((athlete) => {
     return {
       name: `${athlete.firstName} ${athlete.lastName}`,
-      lot: athlete.lot,
+      lot: '' + athlete.lot,
       bodyWeight: prettyPrintWeight(athlete.bodyWeight),
       total: prettyPrintWeight(athlete.calcTotal),
-      prognosis: prettyPrintWeight(athlete.calcTotal),
+      prognosis: prettyPrintWeight(calculatePrognosis(athlete)),
       bestSquat: prettyPrintWeight(athlete.squatTotal),
       bestBench: prettyPrintWeight(athlete.benchPressTotal),
       bestDeadlift: prettyPrintWeight(athlete.deadliftTotal)
     }
   })
+  return padToSize(
+    res,
+    {
+      name: '',
+      lot: '',
+      bodyWeight: '',
+      total: '',
+      prognosis: '',
+      bestSquat: '',
+      bestBench: '',
+      bestDeadlift: ''
+    },
+    state.overallScoreboardSettings.pageSize
+  )
 }
 
 async function getSquatScoreboard(client, state) {
@@ -43,14 +58,14 @@ async function getSquatScoreboard(client, state) {
     offset + state.squatScoreboardSettings.pageSize
   )
   const subset = scoreboardData.competitionAthletes.slice(offset, to)
-  return subset.map((athlete) => {
+  const res = subset.map((athlete) => {
     const attempts = filterAndSortAttempts(athlete.competitionAthleteAttempts, 'squat')
     return {
       name: `${athlete.firstName} ${athlete.lastName}`,
-      lot: athlete.lot,
+      lot: '' + athlete.lot,
       bodyWeight: prettyPrintWeight(athlete.bodyWeight),
       total: prettyPrintWeight(athlete.calcTotal),
-      prognosis: prettyPrintWeight(athlete.calcTotal),
+      prognosis: prettyPrintWeight(calculatePrognosis(athlete)),
       attempt1: prettyPrintWeight(attempts[0].weight),
       attempt2: prettyPrintWeight(attempts[1].weight),
       attempt3: prettyPrintWeight(attempts[2].weight),
@@ -62,6 +77,26 @@ async function getSquatScoreboard(client, state) {
       attemptStatus3: attempts[2].status
     }
   })
+  return padToSize(
+    res,
+    {
+      name: '',
+      lot: '',
+      bodyWeight: '',
+      total: '',
+      prognosis: '',
+      attempt1: '',
+      attempt2: '',
+      attempt3: '',
+      attemptColor1: colorInvisible,
+      attemptColor2: colorInvisible,
+      attemptColor3: colorInvisible,
+      attemptStatus1: '',
+      attemptStatus2: '',
+      attemptStatus3: ''
+    },
+    state.squatScoreboardSettings.pageSize
+  )
 }
 
 async function getBenchScoreboard(client, state) {
@@ -77,14 +112,14 @@ async function getBenchScoreboard(client, state) {
     offset + state.benchPressScoreboardSettings.pageSize
   )
   const subset = scoreboardData.competitionAthletes.slice(offset, to)
-  return subset.map((athlete) => {
+  const res = subset.map((athlete) => {
     const attempts = filterAndSortAttempts(athlete.competitionAthleteAttempts, 'benchPress')
     return {
       name: `${athlete.firstName} ${athlete.lastName}`,
-      lot: athlete.lot,
+      lot: '' + athlete.lot,
       bodyWeight: prettyPrintWeight(athlete.bodyWeight),
       total: prettyPrintWeight(athlete.calcTotal),
-      prognosis: prettyPrintWeight(athlete.calcTotal),
+      prognosis: prettyPrintWeight(calculatePrognosis(athlete)),
       bestSquat: prettyPrintWeight(athlete.squatTotal),
       attempt1: prettyPrintWeight(attempts[0].weight),
       attempt2: prettyPrintWeight(attempts[1].weight),
@@ -97,6 +132,27 @@ async function getBenchScoreboard(client, state) {
       attemptStatus3: attempts[2].status
     }
   })
+  return padToSize(
+    res,
+    {
+      name: '',
+      lot: '',
+      bodyWeight: '',
+      total: '',
+      prognosis: '',
+      bestSquat: '',
+      attempt1: '',
+      attempt2: '',
+      attempt3: '',
+      attemptColor1: colorInvisible,
+      attemptColor2: colorInvisible,
+      attemptColor3: colorInvisible,
+      attemptStatus1: '',
+      attemptStatus2: '',
+      attemptStatus3: ''
+    },
+    state.benchPressScoreboardSettings.pageSize
+  )
 }
 
 async function getDeadliftScoreboard(client, state) {
@@ -112,14 +168,14 @@ async function getDeadliftScoreboard(client, state) {
     offset + state.deadliftScoreboardSettings.pageSize
   )
   const subset = scoreboardData.competitionAthletes.slice(offset, to)
-  return subset.map((athlete) => {
+  const res = subset.map((athlete) => {
     const attempts = filterAndSortAttempts(athlete.competitionAthleteAttempts, 'deadlift')
     return {
       name: `${athlete.firstName} ${athlete.lastName}`,
-      lot: athlete.lot,
+      lot: '' + athlete.lot,
       bodyWeight: prettyPrintWeight(athlete.bodyWeight),
       total: prettyPrintWeight(athlete.calcTotal),
-      prognosis: prettyPrintWeight(athlete.calcTotal),
+      prognosis: prettyPrintWeight(calculatePrognosis(athlete)),
       bestSquat: prettyPrintWeight(athlete.squatTotal),
       bestBench: prettyPrintWeight(athlete.benchPressTotal),
       attempt1: prettyPrintWeight(attempts[0].weight),
@@ -133,6 +189,24 @@ async function getDeadliftScoreboard(client, state) {
       attemptStatus3: attempts[2].status
     }
   })
+  return padToSize(res, {
+    name: '',
+    lot: '',
+    bodyWeight: '',
+    total: '',
+    prognosis: '',
+    bestSquat: '',
+    bestBench: '',
+    attempt1: '',
+    attempt2: '',
+    attempt3: '',
+    attemptColor1: colorInvisible,
+    attemptColor2: colorInvisible,
+    attemptColor3: colorInvisible,
+    attemptStatus1: '',
+    attemptStatus2: '',
+    attemptStatus3: ''
+  }, state.deadliftScoreboardSettings.pageSize)
 }
 
 async function getActiveAthlete(client, state) {
@@ -158,7 +232,7 @@ async function getActiveAthlete(client, state) {
     activeLift: prettyPrintDiscipline(activeAttempt.discipline),
     compClass: `${athlete.ageCategory.name} ${athlete.bodyWeightCategory.name}`,
     total: prettyPrintWeight(athlete.calcTotal),
-    prognosis: prettyPrintWeight(athlete.calcTotal),
+    prognosis: prettyPrintWeight(calculatePrognosis(athlete)),
     placement: getPlacement(athlete.id, scoreboardResult),
     bestSquat: prettyPrintWeight(athlete.squatTotal),
     bestBench: prettyPrintWeight(athlete.benchPressTotal),
@@ -173,6 +247,38 @@ async function getActiveAthlete(client, state) {
     attemptStatus2: attempts[1].status,
     attemptStatus3: attempts[2].status
   }
+}
+
+function calculatePrognosis(athlete) {
+  if (athlete.deadliftTotal > 0) {
+    const upcomingAttempt = getUpcomingAttempt(athlete.competitionAthleteAttempts, 'deadlift')
+    return athlete.squatTotal + athlete.benchPressTotal + upcomingAttempt.weight
+  }
+  if (athlete.benchPressTotal > 0) {
+    const deadliftOpener = getUpcomingAttempt(athlete.competitionAthleteAttempts, 'deadlift')
+    return athlete.squatTotal + athlete.benchPressTotal + deadliftOpener.weight
+  }
+  if (athlete.squatTotal > 0) {
+    const benchOpener = getUpcomingAttempt(athlete.competitionAthleteAttempts, 'benchPress')
+    const deadliftOpener = getUpcomingAttempt(athlete.competitionAthleteAttempts, 'deadlift')
+    return athlete.squatTotal + benchOpener.weight + deadliftOpener.weight
+  }
+  const squatOpener = getUpcomingAttempt(athlete.competitionAthleteAttempts, 'squat')
+  const benchOpener = getUpcomingAttempt(athlete.competitionAthleteAttempts, 'benchPress')
+  const deadliftOpener = getUpcomingAttempt(athlete.competitionAthleteAttempts, 'deadlift')
+  return squatOpener.weight + benchOpener.weight + deadliftOpener.weight
+}
+
+function getUpcomingAttempt(attempts, discipline) {
+  const filteredAttempts = filterAndSortAttempts(attempts, discipline)
+  return filteredAttempts.find((attempt) => attempt.status === 'open')
+}
+
+function padToSize(arr, filler, size) {
+  for (let i = arr.length; i < size; i++) {
+    arr.push(filler)
+  }
+  return arr
 }
 
 function prettyPrintDiscipline(discipline) {
