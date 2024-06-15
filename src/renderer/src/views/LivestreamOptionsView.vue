@@ -2,14 +2,13 @@
 import { computed, onBeforeMount, onMounted, onUnmounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import { createClient } from '../vportal/client'
 import { refreshCompetitionData } from '../vportal/state-actions'
 import {
   getActiveAthlete,
-  getOverallScoreboard,
-  getSquatScoreboard,
   getBenchScoreboard,
-  getDeadliftScoreboard
+  getDeadliftScoreboard,
+  getOverallScoreboard,
+  getSquatScoreboard
 } from '../vportal/stream-data'
 import { useToast } from 'vue-toastification'
 
@@ -17,9 +16,9 @@ const store = useStore()
 const router = useRouter()
 const toast = useToast()
 const state = computed(() => store.state.applicationState)
-const gqlClient = createClient(store.state.token)
+const gqlClient = store.state.gqlClient
 
-let interval = 0
+let interval = null
 
 const activeGroups = computed(() =>
   state.value.availableGroups.filter((group) => state.value.activeGroupIds.includes(group.id))
@@ -36,6 +35,11 @@ const benchPressAvailablePages = computed(() =>
 const deadliftAvailablePages = computed(() =>
   Array.from({ length: state.value.deadliftScoreboardSettings.availablePages }, (_, i) => i + 1)
 )
+
+function openLowerThirds() {
+  const r = router.resolve({ name: 'lower-thirds' })
+  window.open(r.href, '_blank', 'width=1400,height=180,nodeIntegration=no')
+}
 
 async function refreshState() {
   refreshCompetitionData(gqlClient, state.value)
@@ -303,6 +307,15 @@ onBeforeMount(() => {
                 </div>
               </div>
             </div>
+          </div>
+          <div class="w-full flex flex-row justify-around py-4">
+            <button
+              type="button"
+              class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+              @click="openLowerThirds"
+            >
+              Lower Thirds
+            </button>
           </div>
         </div>
       </div>

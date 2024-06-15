@@ -1,8 +1,7 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import activeAthleteHtml from '../../resources/html/index.html?raw'
 import express from 'express'
 import cors from 'cors'
 
@@ -23,11 +22,6 @@ function createWindow() {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
-  })
-
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
   })
 
   // HMR for renderer base on electron-vite cli.
@@ -61,12 +55,7 @@ function startExpress(window) {
     })
   })
 
-  app.get('/stream/active-athlete', (req, res) => {
-    res.send(activeAthleteHtml)
-  })
-
-  app.listen(8000)
-  return app
+  return app.listen(8000)
 }
 
 // This method will be called when Electron has finished
@@ -82,9 +71,6 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
-
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
 
   const win = createWindow()
 

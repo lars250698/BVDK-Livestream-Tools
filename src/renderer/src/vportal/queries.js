@@ -4,7 +4,7 @@ import stageListQuery from '../../../../resources/graphql/queries/StageListQuery
 import competitionDataQuery from '../../../../resources/graphql/queries/CompetitionDataQuery.gql?raw'
 import scoreboardQuery from '../../../../resources/graphql/queries/ScoreboardQuery.gql?raw'
 import activeAthleteQuery from '../../../../resources/graphql/queries/ActiveAthleteQuery.gql?raw'
-import { gql, GraphQLClient } from 'graphql-request'
+import { gql } from 'graphql-request'
 
 async function activeAthlete(client, competitionId, competitionStageId) {
   const params = {

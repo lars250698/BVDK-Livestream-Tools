@@ -1,4 +1,4 @@
-import { gql, GraphQLClient } from 'graphql-request'
+import { GraphQLClient } from 'graphql-request'
 
 const url = 'https://staging-bvdk.vportal-online.de/graphql'
 

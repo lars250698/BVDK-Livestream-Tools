@@ -1,15 +1,17 @@
-import { createMemoryHistory, createRouter } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import LivestreamOptionsView from '../views/LivestreamOptionsView.vue'
+import LowerThirds from '../views/LowerThirds.vue'
 
 const routes = [
-  { path: '/', component: LoginView },
-  { path: '/options', component: LivestreamOptionsView },
-  { path: '/login', component: LoginView }
+  { name: 'entry', path: '/', component: LoginView },
+  { name: 'options', path: '/options', component: LivestreamOptionsView },
+  { name: 'login', path: '/login', component: LoginView },
+  { name: 'lower-thirds', path: '/stream/lower-thirds', component: LowerThirds }
 ]
 
 const router = createRouter({
-  history: createMemoryHistory(),
+  history: createWebHashHistory(),
   routes
 })
 
