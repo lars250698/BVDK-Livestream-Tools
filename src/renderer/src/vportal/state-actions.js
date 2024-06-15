@@ -9,10 +9,12 @@ async function initState(client) {
   const defaultBodyWeightCategory =
     compData.competitionGroupList.competitionGroups[0].eventBodyWeightCategoryList
       .eventBodyWeightCategories[0].id
+  const defaultPageSize = 14
   const defaultBodyWeightCategoryScoreboardPages = await getAvailablePages(
     client,
     competitionId,
-    defaultBodyWeightCategory
+    defaultBodyWeightCategory,
+    defaultPageSize
   )
   return {
     competitionId: competitionId,
@@ -23,22 +25,26 @@ async function initState(client) {
     overallScoreboardSettings: {
       selectedBodyWeightCategoryId: defaultBodyWeightCategory,
       availablePages: defaultBodyWeightCategoryScoreboardPages,
-      page: 1
+      page: 1,
+      pageSize: defaultPageSize
     },
     squatScoreboardSettings: {
       selectedBodyWeightCategoryId: defaultBodyWeightCategory,
       availablePages: defaultBodyWeightCategoryScoreboardPages,
-      page: 1
+      page: 1,
+      pageSize: defaultPageSize
     },
     benchPressScoreboardSettings: {
       selectedBodyWeightCategoryId: defaultBodyWeightCategory,
       availablePages: defaultBodyWeightCategoryScoreboardPages,
-      page: 1
+      page: 1,
+      pageSize: defaultPageSize
     },
     deadliftScoreboardSettings: {
       selectedBodyWeightCategoryId: defaultBodyWeightCategory,
       availablePages: defaultBodyWeightCategoryScoreboardPages,
-      page: 1
+      page: 1,
+      pageSize: defaultPageSize
     }
   }
 }
@@ -55,22 +61,26 @@ async function refreshCompetitionData(client, oldState) {
   oldState.overallScoreboardSettings.availablePages = await getAvailablePages(
     client,
     competitionId,
-    oldState.overallScoreboardSettings.selectedBodyWeightCategoryId
+    oldState.overallScoreboardSettings.selectedBodyWeightCategoryId,
+    oldState.overallScoreboardSettings.pageSize
   )
   oldState.squatScoreboardSettings.availablePages = await getAvailablePages(
     client,
     competitionId,
-    oldState.squatScoreboardSettings.selectedBodyWeightCategoryId
+    oldState.squatScoreboardSettings.selectedBodyWeightCategoryId,
+    oldState.squatScoreboardSettings.pageSize
   )
   oldState.benchPressScoreboardSettings.availablePages = await getAvailablePages(
     client,
     competitionId,
-    oldState.benchPressScoreboardSettings.selectedBodyWeightCategoryId
+    oldState.benchPressScoreboardSettings.selectedBodyWeightCategoryId,
+    oldState.benchPressScoreboardSettings.pageSize
   )
   oldState.deadliftScoreboardSettings.availablePages = await getAvailablePages(
     client,
     competitionId,
-    oldState.deadliftScoreboardSettings.selectedBodyWeightCategoryId
+    oldState.deadliftScoreboardSettings.selectedBodyWeightCategoryId,
+    oldState.deadliftScoreboardSettings.pageSize
   )
   return oldState
 }
@@ -104,9 +114,9 @@ function getAvailableGroupsFromCompData(compData) {
   return groups
 }
 
-async function getAvailablePages(client, competitionId, categoryId) {
+async function getAvailablePages(client, competitionId, categoryId, pageSize) {
   const res = await scoreboard(client, competitionId, categoryId)
-  return Math.floor(res.competitionAthletes.length / 14) + 1
+  return Math.floor(res.competitionAthletes.length / pageSize) + 1
 }
 
 export { initState, refreshCompetitionData }

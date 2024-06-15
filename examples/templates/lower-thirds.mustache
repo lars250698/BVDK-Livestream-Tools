@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="index.css">
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,300' rel='stylesheet' type='text/css'>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stream</title>
+  <style>
+    :root {
+      --secondary: #BE0007;
+      --primary: #00497F;
+      --bg-white: #f4f3f2;
+    }
+
+    body {
+      background-color: magenta;
+      font-family: 'Open Sans';
+      text-transform: uppercase;
+      margin: 0px;
+    }
+
+    #container {
+      margin: auto;
+      width: 1300px;
+      height: 120px;
+      padding: 0px 0px 0px;
+      display: flex;
+    }
+
+    #overlay {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      background-color: var(--bg-white);
+      padding: 5px 30px 5px;
+      background: rgb(0,73,127);
+      background: linear-gradient(202deg, rgba(0,73,127,1) 0%, rgba(9,9,121,1) 51%, rgba(190,0,7,1) 100%);
+      border-radius: 5px;
+    }
+
+    #lifter-infos {
+      color: #ffffff;
+      flex-grow: 3;
+      width: 40%;
+    }
+
+    #lift-infos {
+      display: flex;
+      justify-content: end;
+      align-items: center;
+      height: 80%;
+      width: 60%;
+    }
+
+    .elipses {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .title {
+      font-size: 30px;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      font-weight: light;
+      text-transform: uppercase;
+    }
+
+    .box {
+      background-color: var(--bg-white);
+      border-radius: 5px;
+      margin: 5px;
+      padding: 6px 12px 6px;
+    }
+
+    #current-lift {
+      display: flex;
+      align-items: center;
+      justify-content: end;
+      height: 100%;
+      margin-right: 10px;
+    }
+
+    .current-lift {
+      font-size: x-large;
+      font-weight: bold;
+      color: black;
+      height: 45%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #attempts {
+      display: flex;
+      justify-content: start;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    .attempt {
+      width: 52px;
+    }
+
+    .attempt-success {
+      background-color: green;
+      color: white;
+    }
+
+    .attempt-fail {
+      background-color: red;
+      color: white
+    }
+
+    .attempt-ongoing {
+      -webkit-box-shadow: inset 0px 0px 0px 2px white;
+      -moz-box-shadow: inset 0px 0px 0px 2px white;
+      box-shadow: inset 0px 0px 0px 2px white;
+      background-color: var(--primary);
+      color: white;
+    }
+
+    #lifter-infos {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+    }
+
+    #lifter-name {
+      display: flex;
+      align-items: end;
+    }
+
+    .lifter-info {
+      width: 100%;
+      margin-bottom: 1px;
+    }
+
+    #current-lift {
+      height: 100%;
+      align-items: center;
+      display: flex;
+    }
+
+    #best-lifts {
+      display: flex;
+      flex-direction: column;
+      font-size: medium;
+      margin-right: 10px;
+    }
+
+    .best-lift-letter {
+      font-weight: bold;
+      margin-right: 12px;
+    }
+
+    .best-lift-container {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .box.best-lift-container {
+      padding: 2px 15px 2px;
+      border-radius: 5px;
+      margin-top: 2px;
+      margin-bottom: 2px;
+    }
+
+    .subtotal-forecast {
+      display: flex;
+      justify-content: start;
+      align-items: center;
+      font-size: medium;
+    }
+
+    .box.subtotal-forecast {
+      padding: 2px;
+      padding-right: 15px;
+    }
+
+    .subtotal-forecast-name {
+      background-color: var(--primary);
+      color: white;
+      border-radius: 5px;
+      padding: 3px 8px 3px;
+      margin-right: 15px;
+    }
+  </style>
+</head>
+
+<body>
+<div id="container">
+  <div id="overlay">
+    <div id="lifter-infos">
+      <div id="lifter-name" class="lifter-info title">
+        <span class="elipses">{{ name }}</span>
+      </div>
+      <div id="lifter-club" class="lifter-info subtitle">
+        <span class="elipses">{{ club }}</span>
+      </div>
+      <div id="lifter-class" class="lifter-info subtitle">
+        {{ compClass }}
+      </div>
+    </div>
+    <div id="lift-infos">
+      <div id="current-lift">
+        <div id="current-lift-name" class="box current-lift">
+          {{ activeLift }}
+        </div>
+        <div id="attempts">
+          <div id="attempt-one" class="box current-lift attempt {{ #attempt1valid }}attempt-success{{ /attempt1valid }} {{ #attempt1invalid }}attempt-fail{{ /attempt1invalid }}">
+            {{ attempt1 }}
+          </div>
+          <div id="attempt-two" class="box current-lift attempt {{ #attempt2valid }}attempt-success{{ /attempt2valid }} {{ #attempt2invalid }}attempt-fail{{ /attempt2invalid }}">
+            {{ attempt2 }}
+          </div>
+          <div id="attempt-three" class="box current-lift attempt {{ #attempt3valid }}attempt-success{{ /attempt3valid }} {{ #attempt3invalid }}attempt-fail{{ /attempt3invalid }}">
+            {{ attempt3 }}
+          </div>
+        </div>
+      </div>
+      <div id="best-lifts">
+        <div id="best-lift-squat" class="box best-lift-container">
+          <div class="best-lift-letter">
+            S
+          </div>
+          <div class="best-lift-amount">
+            {{ bestSquat }}
+          </div>
+        </div>
+        <div id="best-lift-bench" class="box best-lift-container">
+          <div class="best-lift-letter">
+            B
+          </div>
+          <div class="best-lift-amount">
+            {{ bestBench }}
+          </div>
+        </div>
+        <div id="best-lift-deadlift" class="box best-lift-container">
+          <div class="best-lift-letter">
+            D
+          </div>
+          <div class="best-lift-amount">
+            {{ bestDeadlift }}
+          </div>
+        </div>
+      </div>
+      <div id="subtotal-forecast">
+        <div id="subtotal" class="box subtotal-forecast">
+          <div class="subtotal-forecast-name">
+            Subtotal
+          </div>
+          <div class="subtotal-forecast-amount">
+            {{ total }}
+          </div>
+        </div>
+        <div id="forecast" class="box subtotal-forecast">
+          <div class="subtotal-forecast-name">
+            Forecast
+          </div>
+          <div class="subtotal-forecast-amount">
+            {{ prognosis }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+<script>
+  setTimeout(function(){
+    window.location.reload();
+  }, 2000);
+</script>
+
+</html>

@@ -1,8 +1,6 @@
 import { GraphQLClient } from 'graphql-request'
 
-const url = 'https://staging-bvdk.vportal-online.de/graphql'
-
-function createClient(token) {
+function createClient(url, token) {
   return new GraphQLClient(url, {
     headers: {
       authorization: `Bearer ${token}`

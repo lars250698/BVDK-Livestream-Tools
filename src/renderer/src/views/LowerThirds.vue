@@ -1,6 +1,9 @@
 <script setup>
 import { onBeforeMount, onUnmounted, ref } from 'vue'
 import axios from 'axios'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
 
 const athlete = ref({
   name: '',
@@ -27,7 +30,7 @@ const athlete = ref({
 let interval = null
 
 function getAthlete() {
-  axios.get('http://localhost:8000/active-athlete').then((res) => {
+  axios.get(`http://localhost:${route.params.port}/active-athlete`).then((res) => {
     athlete.value = res.data
   })
 }

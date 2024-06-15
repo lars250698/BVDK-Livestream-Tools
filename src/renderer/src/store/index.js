@@ -6,7 +6,10 @@ import router from '../router'
 let state = {
   token: null,
   gqlClient: null,
-  applicationState: null
+  applicationState: null,
+  vportalUrl: 'https://staging-bvdk.vportal-online.de',
+  loginProxyUrl: 'https://818wrx6ocb.execute-api.eu-central-1.amazonaws.com/default',
+  apiPort: 8000
 }
 
 const getters = {

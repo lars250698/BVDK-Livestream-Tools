@@ -4,12 +4,15 @@ import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import express from 'express'
 import cors from 'cors'
+import Mustache from 'mustache'
 
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 700,
+    width: 1300,
+    height: 900,
+    minWidth: 1100,
+    minHeight: 700,
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
@@ -34,7 +37,7 @@ function createWindow() {
   return mainWindow
 }
 
-function startExpress(window) {
+function startExpress(window, port) {
   const app = express()
   app.use(cors())
 
@@ -55,7 +58,15 @@ function startExpress(window) {
     })
   })
 
-  return app.listen(8000)
+  app.get('/custom/lower-thirds', (req, res) => {
+    window.webContents.send('custom-lower-thirds')
+    ipcMain.once('custom-lower-thirds-response', (e, msg) => {
+      const rendered = Mustache.render(msg.template, msg.data)
+      res.send(rendered)
+    })
+  })
+
+  return app.listen(port)
 }
 
 // This method will be called when Electron has finished
@@ -75,7 +86,7 @@ app.whenReady().then(() => {
   const win = createWindow()
 
   let expressApp = null
-  ipcMain.on('settings-loaded', () => (expressApp = startExpress(win)))
+  ipcMain.on('settings-loaded', (event, args) => (expressApp = startExpress(win, args.port)))
   ipcMain.on('settings-unloaded', () => expressApp.close())
 
   app.on('activate', function () {

@@ -7,7 +7,7 @@ const routes = [
   { name: 'entry', path: '/', component: LoginView },
   { name: 'options', path: '/options', component: LivestreamOptionsView },
   { name: 'login', path: '/login', component: LoginView },
-  { name: 'lower-thirds', path: '/stream/lower-thirds', component: LowerThirds }
+  { name: 'lower-thirds', path: '/stream/lower-thirds/:port', component: LowerThirds }
 ]
 
 const router = createRouter({
