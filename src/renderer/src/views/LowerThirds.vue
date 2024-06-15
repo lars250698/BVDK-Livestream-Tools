@@ -55,23 +55,22 @@ onUnmounted(() => {
 
 <template>
   <div
-    class="flex flex-col justify-center align-middle w-full h-full content-center items-center bg-green-500"
+    class="flex flex-col justify-center align-middle w-full h-full content-center items-center bg-magenta"
   >
     <div id="container">
       <div class="flex flex-row rounded-lg w-full h-full px-4 py-2 gradient">
         <div class="flex flex-row w-1/2">
           <div class="flex flex-col justify-around text-white h-full w-full py-2">
             <div class="text-3xl">
-              <span class="elipses">{{ athlete.name }}</span>
+              <span class="ellipses">{{ athlete.name }}</span>
             </div>
             <div class="text-xl font-light">
-              <span class="elipses">{{ athlete.club }}</span>
+              <span class="ellipses">{{ athlete.club }}</span>
             </div>
             <div class="text-xl font-light">
-              <span class="elipses">{{ athlete.compClass }}</span>
+              <span class="ellipses">{{ athlete.compClass }}</span>
             </div>
           </div>
-          <div id="lifter-class" class="lifter-info subtitle"></div>
         </div>
         <div class="flex flex-row items-center w-2/3 justify-around">
           <div class="flex flex-row justify-end justify-items-end">
@@ -165,7 +164,7 @@ body {
 #container {
   width: 1300px;
   height: 120px;
-  padding: 0px 0px 0px;
+  padding: 0;
   display: flex;
 }
 
@@ -179,173 +178,15 @@ body {
   );
 }
 
-#overlay {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  background-color: var(--bg-white);
-  padding: 5px 30px 5px;
-  background: rgb(0, 73, 127);
-  background: linear-gradient(
-    202deg,
-    rgba(0, 73, 127, 1) 0%,
-    rgba(9, 9, 121, 1) 51%,
-    rgba(190, 0, 7, 1) 100%
-  );
-  border-radius: 5px;
-}
-
-#lifter-infos {
-  color: #ffffff;
-  flex-grow: 3;
-  width: 40%;
-}
-
-#lift-infos {
-  display: flex;
-  justify-content: end;
-  align-items: center;
-  height: 80%;
-  width: 60%;
-}
-
-.elipses {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.title {
-  font-size: 30px;
-  text-transform: uppercase;
-}
-
-.subtitle {
-  font-size: 15px;
-  font-weight: light;
-  text-transform: uppercase;
-}
-
-.box {
-  background-color: var(--bg-white);
-  border-radius: 5px;
-  margin: 5px;
-  padding: 6px 12px 6px;
-}
-
-#current-lift {
-  display: flex;
-  align-items: center;
-  justify-content: end;
-  height: 100%;
-  margin-right: 10px;
-}
-
-.current-lift {
-  font-size: x-large;
-  font-weight: bold;
-  color: black;
-  height: 45%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#attempts {
-  display: flex;
-  justify-content: start;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-}
-
-.attempt {
-  width: 52px;
+.ellipses {
+  @apply whitespace-nowrap text-ellipsis overflow-hidden;
 }
 
 .attempt-success {
-  background-color: green;
-  color: white;
+  @apply bg-green-600 text-white;
 }
 
 .attempt-fail {
-  background-color: red;
-  color: white;
-}
-
-.attempt-ongoing {
-  -webkit-box-shadow: inset 0px 0px 0px 2px white;
-  -moz-box-shadow: inset 0px 0px 0px 2px white;
-  box-shadow: inset 0px 0px 0px 2px white;
-  background-color: var(--primary);
-  color: white;
-}
-
-#lifter-infos {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 100%;
-}
-
-#lifter-name {
-  display: flex;
-  align-items: end;
-}
-
-.lifter-info {
-  width: 100%;
-  margin-bottom: 1px;
-}
-
-#current-lift {
-  height: 100%;
-  align-items: center;
-  display: flex;
-}
-
-#best-lifts {
-  display: flex;
-  flex-direction: column;
-  font-size: medium;
-  margin-right: 10px;
-}
-
-.best-lift-letter {
-  font-weight: bold;
-  margin-right: 12px;
-}
-
-.best-lift-container {
-  display: flex;
-  justify-content: space-between;
-}
-
-.box.best-lift-container {
-  padding: 2px 15px 2px;
-  border-radius: 5px;
-  margin-top: 2px;
-  margin-bottom: 2px;
-}
-
-.subtotal-forecast {
-  display: flex;
-  justify-content: start;
-  align-items: center;
-  font-size: medium;
-}
-
-.box.subtotal-forecast {
-  padding: 2px;
-  padding-right: 15px;
-}
-
-.subtotal-forecast-name {
-  background-color: var(--primary);
-  color: white;
-  border-radius: 5px;
-  padding: 3px 8px 3px;
-  margin-right: 15px;
+  @apply bg-red-600 text-white;
 }
 </style>
