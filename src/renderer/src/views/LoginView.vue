@@ -54,7 +54,7 @@ function login() {
 </script>
 
 <template>
-  <div class="flex w-full h-full bg-gray-900 text-white">
+  <div class="flex w-full h-full bg-sky-950 text-white">
     <loading v-model:active="isLoading" :can-cancel="false" :is-full-page="fullPage" />
     <div class="w-full h-full flex flex-row justify-around">
       <div class="w-1/3 p-4 h-full flex flex-col justify-center">

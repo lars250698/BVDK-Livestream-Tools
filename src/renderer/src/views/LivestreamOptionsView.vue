@@ -204,7 +204,7 @@ onBeforeMount(() => {
   <div class="flex flex-col w-full h-full">
     <div class="flex flex-row h-full w-full max-h-screen">
       <div
-        class="flex w-80 flex-col h-full p-4 bg-blue-950 text-white overflow-x-hidden overflow-y-auto"
+        class="flex w-80 flex-col h-full p-4 bg-sky-950 text-white overflow-x-hidden overflow-y-auto"
       >
         <h2 class="text-white">Gewichtsklassen</h2>
         <div class="py-4 pr-4">
