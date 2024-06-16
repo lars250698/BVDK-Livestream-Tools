@@ -51,7 +51,9 @@ async function handleFileUpload() {
 
 function openLowerThirds() {
   const r = router.resolve({ name: 'lower-thirds', params: { port: store.state.apiPort } })
-  window.open(r.href, '_blank', 'width=1400,height=180,nodeIntegration=no')
+  const fixedWidth = 1350
+  const fixedHeight = 180
+  window.open(r.href, '_blank', fixedWindowFeatures(fixedWidth, fixedHeight))
 }
 
 function openCustomLowerThirds() {
@@ -60,6 +62,15 @@ function openCustomLowerThirds() {
     '_blank',
     'width=1400,height=180,nodeIntegration=no'
   )
+}
+
+function openScoreboard() {
+  const r = router.resolve({ name: 'scoreboard-overall', params: { port: store.state.apiPort } })
+  window.open(r.href, '_blank', fixedWindowFeatures(1050, 600))
+}
+
+function fixedWindowFeatures(fixedWidth, fixedHeight) {
+  return `width=${fixedWidth},minWidth=${fixedWidth},maxWidth=${fixedWidth},height=${fixedHeight},minHeight=${fixedHeight},maxHeight=${fixedHeight},nodeIntegration=no`
 }
 
 function refreshStateWithLoadingIndicator() {
@@ -89,12 +100,13 @@ async function refreshState() {
 window.electron.ipcRenderer.on('active-athlete', (e) => {
   getActiveAthlete(gqlClient, state.value)
     .then((res) => e.sender.send('active-athlete-response', res))
-    .catch((err) =>
+    .catch((err) => {
+      console.error(err)
       e.sender.send('active-athlete-response', {
         error: 'An error occurred while fetching the data',
         detail: err
       })
-    )
+    })
 })
 
 window.electron.ipcRenderer.on('custom-lower-thirds', (e) => {
@@ -111,56 +123,61 @@ window.electron.ipcRenderer.on('custom-lower-thirds', (e) => {
         template: customLowerThirdsTemplate
       })
     })
-    .catch((err) =>
+    .catch((err) => {
+      console.error(err)
       e.sender.send('active-athlete-response', {
         error: 'An error occurred while fetching the data',
         detail: err
       })
-    )
+    })
 })
 
 window.electron.ipcRenderer.on('scoreboard-overall', (e) => {
   getOverallScoreboard(gqlClient, state.value)
     .then((res) => e.sender.send('scoreboard-overall-response', res))
-    .catch((err) =>
+    .catch((err) => {
+      console.error(err)
       e.sender.send('scoreboard-overall-response', {
         error: 'An error occurred while fetching the data',
         detail: err
       })
-    )
+    })
 })
 
 window.electron.ipcRenderer.on('scoreboard-squat', (e) => {
   getSquatScoreboard(gqlClient, state.value)
     .then((res) => e.sender.send('scoreboard-squat-response', res))
-    .catch((err) =>
+    .catch((err) => {
+      console.error(err)
       e.sender.send('scoreboard-squat-response', {
         error: 'An error occurred while fetching the data',
         detail: err
       })
-    )
+    })
 })
 
 window.electron.ipcRenderer.on('scoreboard-bench', (e) => {
   getBenchScoreboard(gqlClient, state.value)
     .then((res) => e.sender.send('scoreboard-bench-response', res))
-    .catch((err) =>
+    .catch((err) => {
+      console.error(err)
       e.sender.send('scoreboard-bench-response', {
         error: 'An error occurred while fetching the data',
         detail: err
       })
-    )
+    })
 })
 
 window.electron.ipcRenderer.on('scoreboard-deadlift', (e) => {
   getDeadliftScoreboard(gqlClient, state.value)
     .then((res) => e.sender.send('scoreboard-deadlift-response', res))
-    .catch((err) =>
+    .catch((err) => {
+      console.error(err)
       e.sender.send('scoreboard-deadlift-response', {
         error: 'An error occurred while fetching the data',
         detail: err
       })
-    )
+    })
 })
 
 onMounted(() => {
@@ -395,7 +412,9 @@ onBeforeMount(() => {
               <button type="button" class="btn-secondary" @click="openLowerThirds">
                 Lower Thirds
               </button>
-              <button type="button" class="btn-secondary">Scoreboard</button>
+              <button type="button" class="btn-secondary" @click="openScoreboard">
+                Scoreboard
+              </button>
             </div>
             <div class="flex flex-col w-96 py-4">
               <div class="flex flex-row">

@@ -1,7 +1,4 @@
 import { createStore } from 'vuex'
-import axios from 'axios'
-import qs from 'qs'
-import router from '../router'
 
 let state = {
   token: null,
@@ -18,14 +15,7 @@ const getters = {
   }
 }
 
-const actions = {
-  logIn({ commit }, input) {
-    axios.post('/auth/login', qs.stringify(input)).then(({ data }) => {
-      commit('setApplicationState', data)
-      router.push('/options')
-    })
-  }
-}
+const actions = {}
 
 const mutations = {
   setApplicationState(state, applicationState) {

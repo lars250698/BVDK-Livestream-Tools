@@ -42,7 +42,7 @@ function login() {
     })
     .catch((err) => {
       isLoading.value = false
-      if (err.staus === 401) {
+      if (err.status === 401) {
         toast.error('Wrong login data!')
       } else {
         toast.error('An error occurred during login.')
