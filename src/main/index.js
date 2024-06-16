@@ -2,9 +2,7 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import express from 'express'
-import cors from 'cors'
-import Mustache from 'mustache'
+import livestreamToolsApi from './livestreamToolsApi'
 
 function createWindow() {
   // Create the browser window.
@@ -37,38 +35,6 @@ function createWindow() {
   return mainWindow
 }
 
-function startExpress(window, port) {
-  const app = express()
-  app.use(cors())
-
-  app.get('/active-athlete', (req, res) => {
-    window.webContents.send('active-athlete')
-    ipcMain.once('active-athlete-response', (e, msg) => {
-      res.send(msg)
-    })
-  })
-
-  app.get('/scoreboard/:category', (req, res) => {
-    if (!['overall', 'squat', 'bench', 'deadlift'].includes(req.params.category)) {
-      res.status(404).send('Not found')
-    }
-    window.webContents.send(`scoreboard-${req.params.category}`)
-    ipcMain.once(`scoreboard-${req.params.category}-response`, (e, msg) => {
-      res.send(msg)
-    })
-  })
-
-  app.get('/custom/lower-thirds', (req, res) => {
-    window.webContents.send('custom-lower-thirds')
-    ipcMain.once('custom-lower-thirds-response', (e, msg) => {
-      const rendered = Mustache.render(msg.template, msg.data)
-      res.send(rendered)
-    })
-  })
-
-  return app.listen(port)
-}
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -86,8 +52,8 @@ app.whenReady().then(() => {
   const win = createWindow()
 
   let expressApp = null
-  ipcMain.on('settings-loaded', (event, args) => (expressApp = startExpress(win, args.port)))
-  ipcMain.on('settings-unloaded', () => expressApp.close())
+  ipcMain.on('start-api', (event, args) => (expressApp = livestreamToolsApi(win, args.port)))
+  ipcMain.on('stop-api', () => expressApp.close())
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

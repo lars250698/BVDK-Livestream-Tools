@@ -1,12 +1,16 @@
 import { createStore } from 'vuex'
 
+const defaultSettings = {
+  vportalUrl: 'https://bvdk.vportal-online.de',
+  loginProxyUrl: 'https://818wrx6ocb.execute-api.eu-central-1.amazonaws.com/default/vportal-auth-proxy',
+  apiPort: 8000
+}
+
 let state = {
   token: null,
   gqlClient: null,
   applicationState: null,
-  vportalUrl: 'https://bvdk.vportal-online.de',
-  loginProxyUrl: 'https://818wrx6ocb.execute-api.eu-central-1.amazonaws.com/default/vportal-auth-proxy',
-  apiPort: 8000
+  appSettings: defaultSettings
 }
 
 const getters = {
@@ -26,11 +30,16 @@ const mutations = {
   },
   setGqlClient(state, client) {
     state.gqlClient = client
+  },
+  resetAppSettings(state) {
+    state.appSettings = defaultSettings
   }
 }
 export default createStore({
   state,
   getters,
   actions,
-  mutations
+  mutations,
 })
+
+export { defaultSettings }

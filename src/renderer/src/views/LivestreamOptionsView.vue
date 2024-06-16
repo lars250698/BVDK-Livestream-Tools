@@ -50,7 +50,7 @@ async function handleFileUpload() {
 }
 
 function openLowerThirds() {
-  const r = router.resolve({ name: 'lower-thirds', params: { port: store.state.apiPort } })
+  const r = router.resolve({ name: 'lower-thirds', params: { port: store.state.appSettings.apiPort } })
   const fixedWidth = 1350
   const fixedHeight = 180
   window.open(r.href, '_blank', fixedWindowFeatures(fixedWidth, fixedHeight))
@@ -58,7 +58,7 @@ function openLowerThirds() {
 
 function openCustomLowerThirds() {
   window.open(
-    `http://localhost:${store.state.apiPort}/custom/lower-thirds`,
+    `http://localhost:${store.state.appSettings.apiPort}/custom/lower-thirds`,
     '_blank',
     'width=1400,height=180,nodeIntegration=no'
   )
@@ -67,7 +67,7 @@ function openCustomLowerThirds() {
 function openScoreboard(category) {
   const r = router.resolve({
     name: `scoreboard-${category}`,
-    params: { port: store.state.apiPort }
+    params: { port: store.state.appSettings.apiPort }
   })
   window.open(r.href, '_blank', fixedWindowFeatures(1050, 600))
 }
@@ -100,97 +100,41 @@ async function refreshState() {
     })
 }
 
-window.electron.ipcRenderer.on('active-athlete', (e) => {
-  getActiveAthlete(gqlClient, state.value)
-    .then((res) => e.sender.send('active-athlete-response', res))
-    .catch((err) => {
-      console.error(err)
-      e.sender.send('active-athlete-response', {
-        error: 'An error occurred while fetching the data',
-        detail: err
-      })
+window.livestreamToolsApi.customLowerThirdsHandler(
+  () =>
+    new Promise((resolve, reject) => {
+      getActiveAthlete(gqlClient, state.value)
+        .then((res) => {
+          res.attempt1valid = res.attemptStatus1 === 'valid'
+          res.attempt2valid = res.attemptStatus2 === 'valid'
+          res.attempt3valid = res.attemptStatus3 === 'valid'
+          res.attempt1invalid = res.attemptStatus1 === 'invalid'
+          res.attempt2invalid = res.attemptStatus2 === 'invalid'
+          res.attempt3invalid = res.attemptStatus3 === 'invalid'
+          resolve({
+            data: res,
+            template: customLowerThirdsTemplate
+          })
+        })
+        .catch((err) => {
+          reject(err)
+        })
     })
-})
-
-window.electron.ipcRenderer.on('custom-lower-thirds', (e) => {
-  getActiveAthlete(gqlClient, state.value)
-    .then((res) => {
-      res.attempt1valid = res.attemptStatus1 === 'valid'
-      res.attempt2valid = res.attemptStatus2 === 'valid'
-      res.attempt3valid = res.attemptStatus3 === 'valid'
-      res.attempt1invalid = res.attemptStatus1 === 'invalid'
-      res.attempt2invalid = res.attemptStatus2 === 'invalid'
-      res.attempt3invalid = res.attemptStatus3 === 'invalid'
-      e.sender.send('custom-lower-thirds-response', {
-        data: res,
-        template: customLowerThirdsTemplate
-      })
-    })
-    .catch((err) => {
-      console.error(err)
-      e.sender.send('active-athlete-response', {
-        error: 'An error occurred while fetching the data',
-        detail: err
-      })
-    })
-})
-
-window.electron.ipcRenderer.on('scoreboard-overall', (e) => {
-  getOverallScoreboard(gqlClient, state.value)
-    .then((res) => e.sender.send('scoreboard-overall-response', res))
-    .catch((err) => {
-      console.error(err)
-      e.sender.send('scoreboard-overall-response', {
-        error: 'An error occurred while fetching the data',
-        detail: err
-      })
-    })
-})
-
-window.electron.ipcRenderer.on('scoreboard-squat', (e) => {
-  getSquatScoreboard(gqlClient, state.value)
-    .then((res) => e.sender.send('scoreboard-squat-response', res))
-    .catch((err) => {
-      console.error(err)
-      e.sender.send('scoreboard-squat-response', {
-        error: 'An error occurred while fetching the data',
-        detail: err
-      })
-    })
-})
-
-window.electron.ipcRenderer.on('scoreboard-bench', (e) => {
-  getBenchScoreboard(gqlClient, state.value)
-    .then((res) => e.sender.send('scoreboard-bench-response', res))
-    .catch((err) => {
-      console.error(err)
-      e.sender.send('scoreboard-bench-response', {
-        error: 'An error occurred while fetching the data',
-        detail: err
-      })
-    })
-})
-
-window.electron.ipcRenderer.on('scoreboard-deadlift', (e) => {
-  getDeadliftScoreboard(gqlClient, state.value)
-    .then((res) => e.sender.send('scoreboard-deadlift-response', res))
-    .catch((err) => {
-      console.error(err)
-      e.sender.send('scoreboard-deadlift-response', {
-        error: 'An error occurred while fetching the data',
-        detail: err
-      })
-    })
-})
+)
+window.livestreamToolsApi.activeAthleteRequestHandler(() => getActiveAthlete(gqlClient, state.value))
+window.livestreamToolsApi.overallScoreboardHandler(() => getOverallScoreboard(gqlClient, state.value))
+window.livestreamToolsApi.squatScoreboardHandler(() => getSquatScoreboard(gqlClient, state.value))
+window.livestreamToolsApi.benchScoreboardHandler(() => getBenchScoreboard(gqlClient, state.value))
+window.livestreamToolsApi.deadliftScoreboardHandler(() => getDeadliftScoreboard(gqlClient, state.value))
 
 onMounted(() => {
   interval = setInterval(refreshState, 10000)
-  window.electron.ipcRenderer.send('settings-loaded', { port: store.state.apiPort })
+  window.livestreamToolsApi.start(store.state.appSettings.apiPort)
 })
 
 onUnmounted(() => {
   clearInterval(interval)
-  window.electron.ipcRenderer.send('settings-unloaded')
+  window.livestreamToolsApi.stop()
 })
 
 onBeforeMount(() => {
