@@ -64,8 +64,11 @@ function openCustomLowerThirds() {
   )
 }
 
-function openScoreboard() {
-  const r = router.resolve({ name: 'scoreboard-overall', params: { port: store.state.apiPort } })
+function openScoreboard(category) {
+  const r = router.resolve({
+    name: `scoreboard-${category}`,
+    params: { port: store.state.apiPort }
+  })
   window.open(r.href, '_blank', fixedWindowFeatures(1050, 600))
 }
 
@@ -412,8 +415,17 @@ onBeforeMount(() => {
               <button type="button" class="btn-secondary" @click="openLowerThirds">
                 Lower Thirds
               </button>
-              <button type="button" class="btn-secondary" @click="openScoreboard">
+              <button type="button" class="btn-secondary" @click="openScoreboard('overall')">
                 Scoreboard
+              </button>
+              <button type="button" class="btn-secondary" @click="openScoreboard('squat')">
+                Scoreboard Squat
+              </button>
+              <button type="button" class="btn-secondary" @click="openScoreboard('bench')">
+                Scoreboard Bench
+              </button>
+              <button type="button" class="btn-secondary" @click="openScoreboard('deadlift')">
+                Scoreboard Deadlift
               </button>
             </div>
             <div class="flex flex-col w-96 py-4">
