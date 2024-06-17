@@ -1,4 +1,10 @@
-import { createRouter, createWebHashHistory, RouteRecordRaw, RouteLocation, NavigationGuardNext } from 'vue-router'
+import {
+  createRouter,
+  createWebHashHistory,
+  RouteRecordRaw,
+  RouteLocation,
+  NavigationGuardNext
+} from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import LivestreamOptionsView from '../views/LivestreamOptionsView.vue'
 import LowerThirds from '../views/LowerThirds.vue'
@@ -6,13 +12,15 @@ import Scoreboard from '../views/Scoreboard.vue'
 import ScoreboardSquat from '../views/ScoreboardSquat.vue'
 import ScoreboardBench from '../views/ScoreboardBench.vue'
 import ScoreboardDeadlift from '../views/ScoreboardDeadlift.vue'
+import Logout from '../views/Logout.vue'
 
 const defaultTitle = 'BVDK Livestream Tools'
 
 const routes: Array<RouteRecordRaw> = [
-  { name: 'entry', path: '/', component: LoginView },
+  { name: 'entry', path: '/', redirect: '/login' },
   { name: 'options', path: '/options', component: LivestreamOptionsView },
   { name: 'login', path: '/login', component: LoginView },
+  { name: 'logout', path: '/logout', component: Logout },
   {
     name: 'lower-thirds',
     path: '/stream/lower-thirds/:port',

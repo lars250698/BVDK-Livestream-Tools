@@ -99,6 +99,10 @@ function refreshStateWithLoadingIndicator() {
     })
 }
 
+function logout() {
+  router.push('/logout')
+}
+
 async function refreshState() {
   refreshCompetitionData(gqlClient, state.value)
     .then((newState) => {
@@ -168,20 +172,27 @@ onBeforeMount(() => {
       <div
         class="flex w-80 flex-col h-full p-4 bg-sky-950 text-white overflow-x-hidden overflow-y-auto"
       >
-        <h2 class="text-white">Gewichtsklassen</h2>
-        <div class="py-4 pr-4">
-          <div v-for="group in activeGroups" :key="group.id">
-            <h3>{{ group.name }}</h3>
-            <ul>
-              <li
-                v-for="category in group.bodyWeightCategories"
-                :key="category.id"
-                class="border-b border-gray-600 border-opacity-20 last:border-none py-1 text-gray-300 font-extralight"
-              >
-                {{ category.name }} ({{ category.ageCategoryName }})
-              </li>
-            </ul>
+        <div class="flex flex-col w-full h-full justify-between">
+          <div class="flex flex-col">
+            <h2 class="text-white">Gewichtsklassen</h2>
+            <div class="py-4 pr-4">
+              <div v-for="group in activeGroups" :key="group.id">
+                <h3>{{ group.name }}</h3>
+                <ul>
+                  <li
+                    v-for="category in group.bodyWeightCategories"
+                    :key="category.id"
+                    class="border-b border-gray-600 border-opacity-20 last:border-none py-1 text-gray-300 font-extralight"
+                  >
+                    {{ category.name }} ({{ category.ageCategoryName }})
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
+        </div>
+        <div class="flex">
+          <button type="button" class="btn-secondary" @click="logout">Log out</button>
         </div>
       </div>
 
