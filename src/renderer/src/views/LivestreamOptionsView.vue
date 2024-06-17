@@ -100,7 +100,7 @@ async function refreshState() {
     })
 }
 
-window.livestreamToolsApi.customLowerThirdsHandler(
+window.livestreamToolsApi.onCustomLowerThirdsRequest(
   () =>
     new Promise((resolve, reject) => {
       getActiveAthlete(gqlClient, state.value)
@@ -121,11 +121,11 @@ window.livestreamToolsApi.customLowerThirdsHandler(
         })
     })
 )
-window.livestreamToolsApi.activeAthleteRequestHandler(() => getActiveAthlete(gqlClient, state.value))
-window.livestreamToolsApi.overallScoreboardHandler(() => getOverallScoreboard(gqlClient, state.value))
-window.livestreamToolsApi.squatScoreboardHandler(() => getSquatScoreboard(gqlClient, state.value))
-window.livestreamToolsApi.benchScoreboardHandler(() => getBenchScoreboard(gqlClient, state.value))
-window.livestreamToolsApi.deadliftScoreboardHandler(() => getDeadliftScoreboard(gqlClient, state.value))
+window.livestreamToolsApi.onActiveAthleteRequest(() => getActiveAthlete(gqlClient, state.value))
+window.livestreamToolsApi.onOverallScoreboardRequest(() => getOverallScoreboard(gqlClient, state.value))
+window.livestreamToolsApi.onSquatScoreboardRequest(() => getSquatScoreboard(gqlClient, state.value))
+window.livestreamToolsApi.onBenchScoreboardRequest(() => getBenchScoreboard(gqlClient, state.value))
+window.livestreamToolsApi.onDeadliftScoreboardRequest(() => getDeadliftScoreboard(gqlClient, state.value))
 
 onMounted(() => {
   interval = setInterval(refreshState, 10000)
