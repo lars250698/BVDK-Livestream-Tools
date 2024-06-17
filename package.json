@@ -20,10 +20,12 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
+    "@types/express": "^4.17.21",
+    "@types/mustache": "^4.2.5",
     "axios": "^1.7.2",
     "cors": "^2.8.5",
     "express": "^4.19.2",
-    "graphql-request": "^7.0.1",
+    "graphql-request": "5.1.0",
     "mustache": "^4.2.0",
     "vue-loading-overlay": "^6.0.4",
     "vue-router": "^4.3.3",
@@ -32,9 +34,13 @@
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^1.0.1",
+    "@electron-toolkit/eslint-config-ts": "^1.0.1",
+    "@electron-toolkit/tsconfig": "^1.0.1",
     "@rushstack/eslint-patch": "^1.6.1",
+    "@types/node": "^18.19.34",
     "@vitejs/plugin-vue": "^5.0.3",
     "@vue/eslint-config-prettier": "^9.0.0",
+    "@vue/eslint-config-typescript": "^12.0.0",
     "autoprefixer": "^10.4.19",
     "electron": "^28.2.0",
     "electron-builder": "^24.9.1",
@@ -44,7 +50,9 @@
     "postcss": "^8.4.38",
     "prettier": "^3.2.4",
     "tailwindcss": "^3.4.4",
+    "typescript": "^5.3.3",
     "vite": "^5.0.12",
-    "vue": "^3.4.15"
+    "vue": "^3.4.15",
+    "vue-tsc": "^1.8.27"
   }
 }

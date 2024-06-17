@@ -1,6 +1,6 @@
 import { GraphQLClient } from 'graphql-request'
 
-function createClient(url, token) {
+function createClient(url: string, token: string): GraphQLClient {
   return new GraphQLClient(url, {
     headers: {
       authorization: `Bearer ${token}`

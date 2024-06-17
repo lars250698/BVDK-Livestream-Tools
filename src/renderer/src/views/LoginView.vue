@@ -1,5 +1,5 @@
-<script setup>
-import { onBeforeUnmount, onMounted, onUnmounted, ref } from 'vue'
+<script setup lang="ts">
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import Loading from 'vue-loading-overlay'
@@ -31,7 +31,10 @@ function login() {
     })
     .then((res) => {
       store.commit('setToken', res.data.token)
-      const gqlClient = createClient(store.state.appSettings.vportalUrl + '/graphql', store.state.token)
+      const gqlClient = createClient(
+        store.state.appSettings.vportalUrl + '/graphql',
+        store.state.token
+      )
       store.commit('setGqlClient', gqlClient)
       initState(store.state.gqlClient)
         .then((s) => {
@@ -122,7 +125,6 @@ onBeforeUnmount(() => {
             v-model="store.state.appSettings.vportalUrl"
             class="input"
             type="url"
-            @change="updateSettings"
           />
         </div>
         <div class="my-2">
@@ -134,7 +136,6 @@ onBeforeUnmount(() => {
             v-model="store.state.appSettings.loginProxyUrl"
             class="input"
             type="url"
-            @change="updateSettings"
           />
         </div>
         <div class="my-2">
@@ -144,11 +145,12 @@ onBeforeUnmount(() => {
             v-model="store.state.appSettings.apiPort"
             class="input"
             type="number"
-            @change="updateSettings"
           />
         </div>
         <div class="my-2">
-          <button type="button" class="btn-secondary w-full" @click="resetSettings">Reset to defaults</button>
+          <button type="button" class="btn-secondary w-full" @click="resetSettings">
+            Reset to defaults
+          </button>
         </div>
       </div>
     </div>

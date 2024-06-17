@@ -3,8 +3,10 @@ import { join } from 'path'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import livestreamToolsApi from './livestreamToolsApi'
+import * as http from 'http'
+import IpcMainEvent = Electron.IpcMainEvent
 
-function createWindow() {
+function createWindow(): BrowserWindow {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1150,
@@ -32,6 +34,7 @@ function createWindow() {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
   return mainWindow
 }
 
@@ -51,9 +54,12 @@ app.whenReady().then(() => {
 
   const win = createWindow()
 
-  let expressApp = null
-  ipcMain.on('start-api', (event, args) => (expressApp = livestreamToolsApi(win, args.port)))
-  ipcMain.on('stop-api', () => expressApp.close())
+  let expressApp: http.Server | null = null
+  ipcMain.on(
+    'start-api',
+    (_: IpcMainEvent, args) => (expressApp = livestreamToolsApi(win, args.port))
+  )
+  ipcMain.on('stop-api', () => expressApp?.close())
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

@@ -6,10 +6,10 @@ module.exports = {
       colors: {
         'bvdk-blue': '#00497f',
         'bvdk-red': '#be0007',
-        'magenta': '#ff00ff'
+        magenta: '#ff00ff'
       },
       spacing: {
-        '128': '32rem',
+        128: '32rem'
       }
     }
   },

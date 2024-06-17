@@ -1,14 +1,22 @@
 import { activeGroup, competitionData, profileCompetition, scoreboard, stageList } from './queries'
+import { GraphQLClient } from 'graphql-request'
+import {
+  ApplicationState,
+  BodyWeightCategory,
+  CompetitionGroup,
+  CompetitionStage
+} from '../models/state'
+import { CompetitionDataQueryResult } from '../models/vportal'
 
-async function initState(client) {
+async function initState(client: GraphQLClient) {
   const competitionId = await profileCompetition(client)
   const availableStages = await getAvailableStages(client, competitionId)
   const compData = await competitionData(client, competitionId)
   const groups = getAvailableGroupsFromCompData(compData)
   const activeGroupIds = await activeGroup(client, competitionId)
   const defaultBodyWeightCategory =
-    compData.competitionGroupList.competitionGroups[0].eventBodyWeightCategoryList
-      .eventBodyWeightCategories[0].id
+    compData.competition.competitionGroupList?.competitionGroups?.[0].eventBodyWeightCategoryList
+      ?.eventBodyWeightCategories?.[0]?.id ?? ''
   const defaultPageSize = 14
   const defaultBodyWeightCategoryScoreboardPages = await getAvailablePages(
     client,
@@ -32,7 +40,7 @@ async function initState(client) {
       selectedBodyWeightCategoryId: defaultBodyWeightCategory,
       availablePages: defaultBodyWeightCategoryScoreboardPages,
       page: 1,
-      pageSize: defaultPageSize,
+      pageSize: defaultPageSize
     },
     benchPressScoreboardSettings: {
       selectedBodyWeightCategoryId: defaultBodyWeightCategory,
@@ -49,7 +57,7 @@ async function initState(client) {
   }
 }
 
-async function refreshCompetitionData(client, oldState) {
+async function refreshCompetitionData(client: GraphQLClient, oldState: ApplicationState) {
   const competitionId = oldState.competitionId
   const availableStages = await getAvailableStages(client, competitionId)
   const compData = await competitionData(client, competitionId)
@@ -85,46 +93,63 @@ async function refreshCompetitionData(client, oldState) {
   return oldState
 }
 
-async function getAvailableStages(client, competitionId) {
+async function getAvailableStages(
+  client: GraphQLClient,
+  competitionId: string
+): Promise<Array<CompetitionStage>> {
   const stages = await stageList(client, competitionId)
-  return stages.competitionStages.map((stage) => {
+  if (!stages.competitionStageList.competitionStages) {
+    return []
+  }
+  return stages.competitionStageList.competitionStages.map((stage) => {
     return {
       id: stage.id,
       name: stage.name
-    }
+    } as CompetitionStage
   })
 }
 
-function getAvailableGroupsFromCompData(compData) {
-  const groups = compData.competitionGroupList.competitionGroups.map((group) => {
-    return {
-      id: group.id,
-      name: group.name,
-      bodyWeightCategories: group.eventBodyWeightCategoryList.eventBodyWeightCategories.map(
-        (category) => {
-          return {
-            id: category.id,
-            name: category.name,
-            ageCategoryName: category.eventAgeCategory.name
+function getAvailableGroupsFromCompData(
+  compData: CompetitionDataQueryResult
+): Array<CompetitionGroup> {
+  return (
+    compData.competition.competitionGroupList?.competitionGroups?.map((group) => {
+      return {
+        id: group.id,
+        name: group.name,
+        bodyWeightCategories: group.eventBodyWeightCategoryList.eventBodyWeightCategories.map(
+          (category) => {
+            return {
+              id: category.id,
+              name: category.name,
+              ageCategoryName: category.eventAgeCategory.name
+            } as BodyWeightCategory
           }
-        }
-      )
-    }
-  })
-  return groups
+        )
+      }
+    }) ?? []
+  )
 }
 
-async function getAvailablePages(client, competitionId, categoryId, pageSize) {
+async function getAvailablePages(
+  client: GraphQLClient,
+  competitionId: string,
+  categoryId: string,
+  pageSize: number
+): Promise<number> {
   const res = await scoreboard(client, competitionId, categoryId)
-  if (res.competitionAthletes.length === 0) {
-    return 1
+  if (
+    res.competitionAthleteList.competitionAthletes &&
+    res.competitionAthleteList.competitionAthletes.length > 0
+  ) {
+    const pg = res.competitionAthleteList.competitionAthletes.length / pageSize
+    if (pg % 1 === 0) {
+      return pg
+    } else {
+      return pg + 1
+    }
   }
-  const pg = res.competitionAthletes.length / pageSize
-  if (pg % 1 === 0) {
-    return pg
-  } else {
-    return pg + 1
-  }
+  return 1
 }
 
 export { initState, refreshCompetitionData }

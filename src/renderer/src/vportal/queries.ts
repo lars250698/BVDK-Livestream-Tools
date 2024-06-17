@@ -4,9 +4,19 @@ import stageListQuery from '../../../../resources/graphql/queries/StageListQuery
 import competitionDataQuery from '../../../../resources/graphql/queries/CompetitionDataQuery.gql?raw'
 import scoreboardQuery from '../../../../resources/graphql/queries/ScoreboardQuery.gql?raw'
 import activeAthleteQuery from '../../../../resources/graphql/queries/ActiveAthleteQuery.gql?raw'
-import { gql } from 'graphql-request'
+import { gql, GraphQLClient } from 'graphql-request'
+import {
+  ActiveAthleteQueryResult,
+  CompetitionDataQueryResult,
+  ScoreboardQueryResult,
+  StageListQueryResult
+} from '../models/vportal'
 
-async function activeAthlete(client, competitionId, competitionStageId) {
+async function activeAthlete(
+  client: GraphQLClient,
+  competitionId: string,
+  competitionStageId: string
+): Promise<ActiveAthleteQueryResult> {
   const params = {
     competitionId: competitionId,
     params: {
@@ -15,23 +25,26 @@ async function activeAthlete(client, competitionId, competitionStageId) {
       }
     }
   }
-  const res = await client.request(
+  return await client.request(
     gql`
       ${activeAthleteQuery}
     `,
     params
   )
-  return res.competitionAthleteAttemptList
 }
 
-async function profileCompetition(client) {
+async function profileCompetition(client: GraphQLClient): Promise<string> {
   const res = await client.request(gql`
     ${profileCompetitionQuery}
   `)
+  // @ts-ignore (Response mapped to usable type)
   return res.profile.competition.id
 }
 
-async function stageList(client, competitionId) {
+async function stageList(
+  client: GraphQLClient,
+  competitionId: string
+): Promise<StageListQueryResult> {
   const params = {
     competitionId: competitionId
   }
@@ -41,10 +54,13 @@ async function stageList(client, competitionId) {
     `,
     params
   )
-  return res.competitionStageList
+  return res
 }
 
-async function competitionData(client, competitionId) {
+async function competitionData(
+  client: GraphQLClient,
+  competitionId: string
+): Promise<CompetitionDataQueryResult> {
   const params = {
     competitionId: competitionId
   }
@@ -54,10 +70,10 @@ async function competitionData(client, competitionId) {
     `,
     params
   )
-  return res.competition
+  return res
 }
 
-async function activeGroup(client, competitionId) {
+async function activeGroup(client: GraphQLClient, competitionId: string): Promise<Array<string>> {
   const params = {
     competitionId: competitionId
   }
@@ -67,10 +83,15 @@ async function activeGroup(client, competitionId) {
     `,
     params
   )
+  // @ts-ignore (Response mapped to usable type)
   return res.competitionGroupList.competitionGroups.map((group) => group.id)
 }
 
-async function scoreboard(client, competitionId, bodyWeightCategoryId) {
+async function scoreboard(
+  client: GraphQLClient,
+  competitionId: string,
+  bodyWeightCategoryId: string
+): Promise<ScoreboardQueryResult> {
   const params = {
     competitionId: competitionId,
     params: {
@@ -80,13 +101,12 @@ async function scoreboard(client, competitionId, bodyWeightCategoryId) {
       }
     }
   }
-  const res = await client.request(
+  return await client.request(
     gql`
       ${scoreboardQuery}
     `,
     params
   )
-  return res.competitionAthleteList
 }
 
 export { activeGroup, profileCompetition, stageList, competitionData, scoreboard, activeAthlete }
