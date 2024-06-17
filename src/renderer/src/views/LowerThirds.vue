@@ -1,11 +1,13 @@
-<script setup>
+<script setup lang="ts">
 import { onBeforeMount, onUnmounted, ref } from 'vue'
 import axios from 'axios'
 import { useRoute } from 'vue-router'
+import { ActiveAthlete } from '../models/stream-data'
+import { AttemptStatus } from '../models/vportal'
 
 const route = useRoute()
 
-const athlete = ref({
+const athlete = ref<ActiveAthlete>({
   name: '',
   club: '',
   activeLift: '',
@@ -22,12 +24,12 @@ const athlete = ref({
   attemptColor1: '',
   attemptColor2: '',
   attemptColor3: '',
-  attemptStatus1: '',
-  attemptStatus2: '',
-  attemptStatus3: ''
+  attemptStatus1: AttemptStatus.Open,
+  attemptStatus2: AttemptStatus.Open,
+  attemptStatus3: AttemptStatus.Open
 })
 
-let interval = null
+let interval: ReturnType<typeof setTimeout> | undefined = undefined
 
 function getAthlete() {
   axios.get(`http://localhost:${route.params.port}/active-athlete`).then((res) => {
@@ -35,12 +37,12 @@ function getAthlete() {
   })
 }
 
-function liftValid(status) {
-  return status === 'valid'
+function liftValid(status: AttemptStatus) {
+  return status === AttemptStatus.Valid
 }
 
-function liftInvalid(status) {
-  return status === 'invalid'
+function liftInvalid(status: AttemptStatus) {
+  return status === AttemptStatus.Invalid
 }
 
 onBeforeMount(() => {

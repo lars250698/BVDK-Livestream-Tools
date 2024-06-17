@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed, onBeforeMount, onMounted, onUnmounted, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
@@ -13,20 +13,24 @@ import {
 import { useToast } from 'vue-toastification'
 import defaultTemplate from '../../../../examples/templates/lower-thirds.mustache?raw'
 import Loading from 'vue-loading-overlay'
+import { ActiveAthleteCustomTemplate } from '../models/stream-data'
+import { AttemptStatus } from '../models/vportal'
+import { CompetitionGroup } from '../models/state'
 
 const store = useStore()
 const router = useRouter()
 const toast = useToast()
 const state = computed(() => store.state.applicationState)
 const gqlClient = store.state.gqlClient
-const customLowerThirdsTemplateFile = ref(null)
-const isLoading = ref(false)
+const isLoading = ref<boolean>(false)
 
 let customLowerThirdsTemplate = defaultTemplate
-let interval = null
+let interval: ReturnType<typeof setTimeout> | undefined = undefined
 
 const activeGroups = computed(() =>
-  state.value.availableGroups.filter((group) => state.value.activeGroupIds.includes(group.id))
+  state.value.availableGroups.filter((group: CompetitionGroup) =>
+    state.value.activeGroupIds.includes(group.id)
+  )
 )
 const overallAvailablePages = computed(() =>
   Array.from({ length: state.value.overallScoreboardSettings.availablePages }, (_, i) => i + 1)
@@ -41,16 +45,22 @@ const deadliftAvailablePages = computed(() =>
   Array.from({ length: state.value.deadliftScoreboardSettings.availablePages }, (_, i) => i + 1)
 )
 
-async function handleFileUpload() {
+async function handleFileUpload($event: Event) {
   const reader = new FileReader()
   reader.onload = (e) => {
-    customLowerThirdsTemplate = e.target.result
+    customLowerThirdsTemplate = e.target?.result ?? ''
   }
-  reader.readAsText(customLowerThirdsTemplateFile.value.files[0])
+  const target = $event.target as HTMLInputElement
+  if (target?.files) {
+    reader.readAsText(target.files[0])
+  }
 }
 
 function openLowerThirds() {
-  const r = router.resolve({ name: 'lower-thirds', params: { port: store.state.appSettings.apiPort } })
+  const r = router.resolve({
+    name: 'lower-thirds',
+    params: { port: store.state.appSettings.apiPort }
+  })
   const fixedWidth = 1350
   const fixedHeight = 180
   window.open(r.href, '_blank', fixedWindowFeatures(fixedWidth, fixedHeight))
@@ -64,7 +74,7 @@ function openCustomLowerThirds() {
   )
 }
 
-function openScoreboard(category) {
+function openScoreboard(category: string) {
   const r = router.resolve({
     name: `scoreboard-${category}`,
     params: { port: store.state.appSettings.apiPort }
@@ -72,7 +82,7 @@ function openScoreboard(category) {
   window.open(r.href, '_blank', fixedWindowFeatures(1050, 600))
 }
 
-function fixedWindowFeatures(fixedWidth, fixedHeight) {
+function fixedWindowFeatures(fixedWidth: number, fixedHeight: number) {
   return `width=${fixedWidth},minWidth=${fixedWidth},maxWidth=${fixedWidth},height=${fixedHeight},minHeight=${fixedHeight},maxHeight=${fixedHeight},nodeIntegration=no`
 }
 
@@ -105,14 +115,18 @@ window.livestreamToolsApi.onCustomLowerThirdsRequest(
     new Promise((resolve, reject) => {
       getActiveAthlete(gqlClient, state.value)
         .then((res) => {
-          res.attempt1valid = res.attemptStatus1 === 'valid'
-          res.attempt2valid = res.attemptStatus2 === 'valid'
-          res.attempt3valid = res.attemptStatus3 === 'valid'
-          res.attempt1invalid = res.attemptStatus1 === 'invalid'
-          res.attempt2invalid = res.attemptStatus2 === 'invalid'
-          res.attempt3invalid = res.attemptStatus3 === 'invalid'
+          const data: ActiveAthleteCustomTemplate = {
+            ...res,
+            attempt1valid: res.attemptStatus1 === AttemptStatus.Valid,
+            attempt2valid: res.attemptStatus2 === AttemptStatus.Valid,
+            attempt3valid: res.attemptStatus3 === AttemptStatus.Valid,
+            attempt1invalid: res.attemptStatus1 === AttemptStatus.Invalid,
+            attempt2invalid: res.attemptStatus2 === AttemptStatus.Invalid,
+            attempt3invalid: res.attemptStatus3 === AttemptStatus.Invalid
+          }
+
           resolve({
-            data: res,
+            data: data,
             template: customLowerThirdsTemplate
           })
         })
@@ -122,10 +136,14 @@ window.livestreamToolsApi.onCustomLowerThirdsRequest(
     })
 )
 window.livestreamToolsApi.onActiveAthleteRequest(() => getActiveAthlete(gqlClient, state.value))
-window.livestreamToolsApi.onOverallScoreboardRequest(() => getOverallScoreboard(gqlClient, state.value))
+window.livestreamToolsApi.onOverallScoreboardRequest(() =>
+  getOverallScoreboard(gqlClient, state.value)
+)
 window.livestreamToolsApi.onSquatScoreboardRequest(() => getSquatScoreboard(gqlClient, state.value))
 window.livestreamToolsApi.onBenchScoreboardRequest(() => getBenchScoreboard(gqlClient, state.value))
-window.livestreamToolsApi.onDeadliftScoreboardRequest(() => getDeadliftScoreboard(gqlClient, state.value))
+window.livestreamToolsApi.onDeadliftScoreboardRequest(() =>
+  getDeadliftScoreboard(gqlClient, state.value)
+)
 
 onMounted(() => {
   interval = setInterval(refreshState, 10000)
@@ -376,10 +394,9 @@ onBeforeMount(() => {
               <div class="flex flex-row">
                 <input
                   id="custom-lower-thirds-input"
-                  ref="customLowerThirdsTemplateFile"
                   class="file-upload mb-2"
                   type="file"
-                  @change="handleFileUpload"
+                  @change="handleFileUpload($event)"
                 />
                 <button type="button" class="btn-secondary" @click="openCustomLowerThirds">
                   Lower Thirds (Custom)

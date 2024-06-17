@@ -2,8 +2,8 @@ import express, { Express, Request, Response } from 'express'
 import cors from 'cors'
 import { BrowserWindow, ipcMain } from 'electron'
 import Mustache from 'mustache'
+import * as http from 'http'
 import IpcMainEvent = Electron.IpcMainEvent
-import * as http from "http";
 
 type TwoWayIpcHandler = (res: unknown) => void
 
@@ -13,10 +13,7 @@ interface TemplateResponse {
 }
 
 function isTemplateResponse(object: unknown): object is TemplateResponse {
-  return (
-    (object as TemplateResponse).template != null &&
-    (object as TemplateResponse).data != null
-  )
+  return (object as TemplateResponse).template != null && (object as TemplateResponse).data != null
 }
 
 export default (window: BrowserWindow, port: number): http.Server => {
