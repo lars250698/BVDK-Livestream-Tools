@@ -36,10 +36,15 @@ const mutations = {
   },
   resetAppSettings(state: State) {
     state.appSettings = defaultSettings
+  },
+  logout(state: State) {
+    state.token = undefined
+    state.gqlClient = undefined
+    state.applicationState = undefined
   }
 }
 export default createStore({
-  state,
+  state: state,
   getters,
   actions,
   mutations
