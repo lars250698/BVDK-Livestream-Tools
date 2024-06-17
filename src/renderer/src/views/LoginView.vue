@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { onBeforeUnmount, onMounted, onUnmounted, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import Loading from 'vue-loading-overlay'
@@ -22,12 +22,16 @@ const isLoading = ref(false)
 function login() {
   isLoading.value = true
   axios
-    .get(store.state.loginProxyUrl, {
-      params: { username: input.value.identity, password: input.value.credential, url: store.state.vportalUrl }
+    .get(store.state.appSettings.loginProxyUrl, {
+      params: {
+        username: input.value.identity,
+        password: input.value.credential,
+        url: store.state.appSettings.vportalUrl
+      }
     })
     .then((res) => {
       store.commit('setToken', res.data.token)
-      const gqlClient = createClient(store.state.vportalUrl + '/graphql', store.state.token)
+      const gqlClient = createClient(store.state.appSettings.vportalUrl + '/graphql', store.state.token)
       store.commit('setGqlClient', gqlClient)
       initState(store.state.gqlClient)
         .then((s) => {
@@ -42,20 +46,43 @@ function login() {
     })
     .catch((err) => {
       isLoading.value = false
-      if (err.status === 401) {
+      if (err.response.status === 401) {
         toast.error('Wrong login data!')
       } else {
         toast.error('An error occurred during login.')
       }
-
       console.error(err)
     })
 }
+
+function saveSettings() {
+  window.localStorage.setItem('appSettings', JSON.stringify(store.state.appSettings))
+}
+
+function loadSettings() {
+  const savedSettingsJson = window.localStorage.getItem('appSettings')
+  if (savedSettingsJson) {
+    store.state.appSettings = JSON.parse(savedSettingsJson)
+  }
+}
+
+function resetSettings() {
+  store.commit('resetAppSettings')
+  saveSettings()
+}
+
+onMounted(() => {
+  loadSettings()
+})
+
+onBeforeUnmount(() => {
+  saveSettings()
+})
 </script>
 
 <template>
   <div class="flex w-full h-full bg-sky-950 text-white">
-    <loading v-model:active="isLoading" :can-cancel="false" :is-full-page="fullPage" />
+    <loading v-model:active="isLoading" :can-cancel="false" :is-full-page="true" />
     <div class="w-full h-full flex flex-row justify-around">
       <div class="w-1/3 p-4 h-full flex flex-col justify-center">
         <form class="flex flex-col">
@@ -90,7 +117,13 @@ function login() {
       <div class="flex flex-col w-1/3 justify-center">
         <div class="my-2">
           <label for="vportal-url" class="label">Vereinsportal URL</label>
-          <input id="vportal-url" class="input" type="url" v-model="store.state.vportalUrl" />
+          <input
+            id="vportal-url"
+            v-model="store.state.appSettings.vportalUrl"
+            class="input"
+            type="url"
+            @change="updateSettings"
+          />
         </div>
         <div class="my-2">
           <label for="login-proxy-url" class="label"
@@ -98,14 +131,24 @@ function login() {
           >
           <input
             id="login-proxy-url"
+            v-model="store.state.appSettings.loginProxyUrl"
             class="input"
             type="url"
-            v-model="store.state.loginProxyUrl"
+            @change="updateSettings"
           />
         </div>
         <div class="my-2">
           <label for="api-port" class="label">API Port</label>
-          <input id="api-port" class="input" type="number" v-model="store.state.apiPort" />
+          <input
+            id="api-port"
+            v-model="store.state.appSettings.apiPort"
+            class="input"
+            type="number"
+            @change="updateSettings"
+          />
+        </div>
+        <div class="my-2">
+          <button type="button" class="btn-secondary w-full" @click="resetSettings">Reset to defaults</button>
         </div>
       </div>
     </div>
