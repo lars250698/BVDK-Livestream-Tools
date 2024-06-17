@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHashHistory, RouteRecordRaw, RouteLocation, NavigationGuardNext } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import LivestreamOptionsView from '../views/LivestreamOptionsView.vue'
 import LowerThirds from '../views/LowerThirds.vue'
@@ -9,7 +9,7 @@ import ScoreboardDeadlift from '../views/ScoreboardDeadlift.vue'
 
 const defaultTitle = 'BVDK Livestream Tools'
 
-const routes = [
+const routes: Array<RouteRecordRaw> = [
   { name: 'entry', path: '/', component: LoginView },
   { name: 'options', path: '/options', component: LivestreamOptionsView },
   { name: 'login', path: '/login', component: LoginView },
@@ -50,10 +50,9 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
-  console.log(to.meta.title)
+router.beforeEach((to: RouteLocation, _: RouteLocation, next: NavigationGuardNext) => {
   if (to.meta.title) {
-    document.title = to.meta.title
+    document.title = to.meta.title as string
   } else {
     document.title = defaultTitle
   }
