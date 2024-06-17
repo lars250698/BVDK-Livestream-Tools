@@ -4,11 +4,9 @@ import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
   main: {
-    assetsInclude: ['**/*.gql', '**/*.graphql', '**/*.mustache'],
     plugins: [externalizeDepsPlugin()]
   },
   preload: {
-    assetsInclude: ['**/*.gql', '**/*.graphql', '**/*.mustache'],
     plugins: [externalizeDepsPlugin()]
   },
   renderer: {
@@ -17,7 +15,6 @@ export default defineConfig({
         '@renderer': resolve('src/renderer/src')
       }
     },
-    assetsInclude: ['**/*.gql', '**/*.graphql', '**/*.mustache'],
     plugins: [vue()]
   }
 })

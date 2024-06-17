@@ -1,13 +1,11 @@
-<script setup lang="ts">
+<script setup>
 import { onBeforeMount, onUnmounted, ref } from 'vue'
 import axios from 'axios'
 import { useRoute } from 'vue-router'
-import { BenchScoreboardEntry } from '../models/stream-data'
-import { AttemptStatus } from '../models/vportal'
 
 const route = useRoute()
 
-const athletes = ref<Array<BenchScoreboardEntry>>(
+const athletes = ref(
   Array(14).fill({
     name: '',
     lot: '',
@@ -21,13 +19,13 @@ const athletes = ref<Array<BenchScoreboardEntry>>(
     attemptColor1: '',
     attemptColor2: '',
     attemptColor3: '',
-    attemptStatus1: AttemptStatus.Open,
-    attemptStatus2: AttemptStatus.Open,
-    attemptStatus3: AttemptStatus.Open
+    attemptStatus1: '',
+    attemptStatus2: '',
+    attemptStatus3: ''
   })
 )
 
-let interval: ReturnType<typeof setTimeout> | undefined = undefined
+let interval = null
 
 function getAthletes() {
   axios.get(`http://localhost:${route.params.port}/scoreboard/bench`).then((res) => {
@@ -77,59 +75,21 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <div
-          v-for="(athlete, idx) in athletes"
-          :key="idx"
-          class="flex flex-col w-full h-8 even:bg-gray-700 odd:bg-gray-500"
-        >
+        <div v-for="(athlete, idx) in athletes" :key="idx" class="flex flex-col w-full h-8 even:bg-gray-700 odd:bg-gray-500">
           <div class="flex flex-row w-full h-full px-2 justify-between text-white items-center">
             <div class="flex flex-row justify-between w-5/6 h-full items-center">
               <div class="flex flex-row justify-start w-3/5 h-full items-center">
-                <div v-if="athlete.name" class="mx-1 flex flex-row justify-center w-6">
-                  {{ idx + 1 }}
-                </div>
+                <div v-if="athlete.name" class="mx-1 flex flex-row justify-center w-6">{{ idx + 1 }}</div>
                 <div v-else class="mx-1 flex flex-row justify-center w-6"></div>
-                <div class="mx-1 flex flex-row h-full items-center justify-center w-16">
-                  {{ athlete.bodyWeight }}
-                </div>
-                <div class="mx-1 flex flex-row h-full items-center justify-center w-10">
-                  {{ athlete.lot }}
-                </div>
-                <div class="mx-1 flex flex-row h-full items-center justify-start w-96">
-                  {{ athlete.name }}
-                </div>
+                <div class="mx-1 flex flex-row h-full items-center justify-center w-16">{{ athlete.bodyWeight }}</div>
+                <div class="mx-1 flex flex-row h-full items-center justify-center w-10">{{ athlete.lot }}</div>
+                <div class="mx-1 flex flex-row h-full items-center justify-start w-96">{{ athlete.name }}</div>
               </div>
               <div class="flex flex-row justify-end w-2/5 h-full items-center">
-                <div class="px-2 flex flex-row h-full items-center justify-center w-16">
-                  {{ athlete.bestSquat }}
-                </div>
-                <div
-                  class="px-2 flex flex-row h-full items-center justify-center w-16"
-                  :class="{
-                    valid: athlete.attemptStatus1 === 'valid',
-                    invalid: athlete.attemptStatus1 === 'invalid'
-                  }"
-                >
-                  {{ athlete.attempt1 }}
-                </div>
-                <div
-                  class="px-2 flex flex-row h-full items-center justify-center w-16"
-                  :class="{
-                    valid: athlete.attemptStatus2 === 'valid',
-                    invalid: athlete.attemptStatus2 === 'invalid'
-                  }"
-                >
-                  {{ athlete.attempt2 }}
-                </div>
-                <div
-                  class="px-2 flex flex-row h-full items-center justify-center w-16"
-                  :class="{
-                    valid: athlete.attemptStatus3 === 'valid',
-                    invalid: athlete.attemptStatus3 === 'invalid'
-                  }"
-                >
-                  {{ athlete.attempt3 }}
-                </div>
+                <div class="px-2 flex flex-row h-full items-center justify-center w-16">{{ athlete.bestSquat }}</div>
+                <div class="px-2 flex flex-row h-full items-center justify-center w-16" :class="{ valid: athlete.attemptStatus1 === 'valid', invalid: athlete.attemptStatus1 === 'invalid' }">{{ athlete.attempt1 }}</div>
+                <div class="px-2 flex flex-row h-full items-center justify-center w-16" :class="{ valid: athlete.attemptStatus2 === 'valid', invalid: athlete.attemptStatus2 === 'invalid' }">{{ athlete.attempt2 }}</div>
+                <div class="px-2 flex flex-row h-full items-center justify-center w-16" :class="{ valid: athlete.attemptStatus3 === 'valid', invalid: athlete.attemptStatus3 === 'invalid' }">{{ athlete.attempt3 }}</div>
               </div>
             </div>
             <div class="flex flex-row justify-end w-36 h-full items-center">

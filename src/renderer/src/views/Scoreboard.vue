@@ -1,12 +1,11 @@
-<script setup lang="ts">
+<script setup>
 import { onBeforeMount, onUnmounted, ref } from 'vue'
 import axios from 'axios'
 import { useRoute } from 'vue-router'
-import { OverallScoreboardEntry } from '../models/stream-data'
 
 const route = useRoute()
 
-const athletes = ref<Array<OverallScoreboardEntry>>(
+const athletes = ref(
   Array(14).fill({
     name: '',
     lot: '',
@@ -19,7 +18,7 @@ const athletes = ref<Array<OverallScoreboardEntry>>(
   })
 )
 
-let interval: ReturnType<typeof setTimeout> | undefined = undefined
+let interval = null
 
 function getAthletes() {
   axios.get(`http://localhost:${route.params.port}/scoreboard/overall`).then((res) => {
@@ -68,17 +67,11 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <div
-          v-for="(athlete, idx) in athletes"
-          :key="idx"
-          class="flex flex-col w-full h-8 even:bg-gray-700 odd:bg-gray-500"
-        >
+        <div v-for="(athlete, idx) in athletes" :key="idx" class="flex flex-col w-full h-8 even:bg-gray-700 odd:bg-gray-500">
           <div class="flex flex-row w-full h-full px-2 justify-between text-white items-center">
             <div class="flex flex-row justify-between w-4/5">
               <div class="flex flex-row justify-start w-3/4">
-                <div v-if="athlete.name" class="mx-1 flex flex-row justify-center w-6">
-                  {{ idx + 1 }}
-                </div>
+                <div v-if="athlete.name" class="mx-1 flex flex-row justify-center w-6">{{ idx + 1 }}</div>
                 <div v-else class="mx-1 flex flex-row justify-center w-6"></div>
                 <div class="mx-1 flex flex-row justify-center w-16">{{ athlete.bodyWeight }}</div>
                 <div class="mx-1 flex flex-row justify-center w-10">{{ athlete.lot }}</div>
@@ -101,4 +94,6 @@ onUnmounted(() => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+
+</style>

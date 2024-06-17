@@ -2,8 +2,8 @@ query scoreboardQuery($competitionId: ID!, $params: CompetitionAthleteListParams
   competitionAthleteList(competitionId: $competitionId, params: $params) {
     competitionAthletes {
       id
-      firstName
       lastName
+      firstName
       lot
       bodyWeight
       total
@@ -11,16 +11,6 @@ query scoreboardQuery($competitionId: ID!, $params: CompetitionAthleteListParams
       squatTotal
       benchPressTotal
       deadliftTotal
-      club {
-        name
-      }
-      ageCategory {
-        name
-      }
-      bodyWeightCategory {
-        id
-        name
-      }
       competitionAthleteAttempts {
         weight
         status

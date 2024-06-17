@@ -6,8 +6,6 @@ query activeAthleteQuery($competitionId: ID!, $params: CompetitionAthleteAttempt
         id
         firstName
         lastName
-        lot
-        bodyWeight
         total
         calcTotal
         squatTotal
