@@ -4,7 +4,11 @@ import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import livestreamToolsApi from './livestreamToolsApi'
 import * as http from 'http'
+import { StateHolder } from './state'
+import { State } from '../shared/models/state'
 import IpcMainEvent = Electron.IpcMainEvent
+
+let stateHolder: StateHolder | undefined
 
 function createWindow(): BrowserWindow {
   // Create the browser window.
@@ -53,6 +57,27 @@ function createWindow(): BrowserWindow {
   return mainWindow
 }
 
+function createStateHolder(): StateHolder {
+  const stateHolder = new StateHolder()
+
+  stateHolder.registerCallback((state: State) => {
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('state-update-renderer', JSON.stringify(state))
+    })
+  })
+
+  ipcMain.on('state-update', (_: IpcMainEvent, state: string) => {
+    stateHolder.setState(JSON.parse(state))
+  })
+
+  ipcMain.handle('vuex-connect', async () => {
+    const state = stateHolder.getState()
+    return JSON.stringify(state)
+  })
+
+  return stateHolder
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -67,6 +92,7 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
+  stateHolder = createStateHolder()
   const win = createWindow()
 
   let expressApp: http.Server | null = null
@@ -94,3 +120,6 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+app.on('before-quit', () => {
+  stateHolder?.saveToDisk()
+})

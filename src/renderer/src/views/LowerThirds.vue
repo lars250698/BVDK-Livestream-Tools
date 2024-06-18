@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { onBeforeMount, onUnmounted, ref } from 'vue'
-import axios from 'axios'
-import { useRoute } from 'vue-router'
+import { onBeforeMount, onMounted, onUnmounted, Ref, ref } from 'vue'
 import { ActiveAthlete } from '../models/stream-data'
 import { AttemptStatus } from '../models/vportal'
+import { useStore } from 'vuex'
+import { GraphQLClient } from 'graphql-request'
+import { createClient } from '../vportal/client'
+import { getActiveAthlete } from '../vportal/stream-data'
 
-const route = useRoute()
+const store = useStore()
+const gqlClient: Ref<GraphQLClient | undefined> = ref(undefined)
 
 const athlete = ref<ActiveAthlete>({
   name: '',
@@ -32,9 +35,11 @@ const athlete = ref<ActiveAthlete>({
 let interval: ReturnType<typeof setTimeout> | undefined = undefined
 
 function getAthlete() {
-  axios.get(`http://localhost:${route.params.port}/active-athlete`).then((res) => {
-    athlete.value = res.data
-  })
+  if (store.state.applicationState && gqlClient.value) {
+    getActiveAthlete(gqlClient.value, store.state.applicationState).then((res) => {
+      athlete.value = res
+    })
+  }
 }
 
 function liftValid(status: AttemptStatus) {
@@ -44,6 +49,35 @@ function liftValid(status: AttemptStatus) {
 function liftInvalid(status: AttemptStatus) {
   return status === AttemptStatus.Invalid
 }
+
+function ensureClient(timeout: number): Promise<GraphQLClient> {
+  const start = Date.now()
+
+  function waitForClient(this: unknown, resolve, reject) {
+    if (store.state.token) {
+      resolve(createClient(store.state.appSettings.vportalUrl, store.state.token))
+    } else if (Date.now() - start >= timeout) {
+      reject(new Error('Timeout'))
+    } else {
+      setTimeout(
+        waitForClient.bind(
+          this as (res: (client: GraphQLClient) => void, reject) => void,
+          resolve,
+          reject
+        ),
+        30
+      )
+    }
+  }
+
+  return new Promise(waitForClient)
+}
+
+onMounted(() => {
+  ensureClient(5000).then((res) => {
+    gqlClient.value = res
+  })
+})
 
 onBeforeMount(() => {
   getAthlete()
@@ -57,7 +91,8 @@ onUnmounted(() => {
 
 <template>
   <div
-    class="flex flex-col justify-center align-middle w-full h-full content-center items-center bg-magenta"
+    class="flex flex-col justify-center align-middle w-full h-full content-center items-center"
+    :style="{ 'background-color': store.state.colorSettings.bgColor }"
   >
     <div id="container">
       <div class="flex flex-row rounded-lg w-full h-full px-4 py-2 gradient">
