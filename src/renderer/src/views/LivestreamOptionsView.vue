@@ -79,7 +79,7 @@ function openScoreboard(category: string) {
     name: `scoreboard-${category}`,
     params: { port: store.state.appSettings.apiPort }
   })
-  window.open(r.href, '_blank', fixedWindowFeatures(1050, 600))
+  window.open(r.href, '_blank', fixedWindowFeatures(1050, 630))
 }
 
 function fixedWindowFeatures(fixedWidth: number, fixedHeight: number) {
@@ -152,6 +152,7 @@ window.livestreamToolsApi.onDeadliftScoreboardRequest(() =>
 onMounted(() => {
   interval = setInterval(refreshState, 10000)
   window.livestreamToolsApi.start(store.state.appSettings.apiPort)
+  console.log(store.state.applicationState)
 })
 
 onUnmounted(() => {
@@ -170,7 +171,7 @@ onBeforeMount(() => {
   <div class="flex flex-col w-full h-full">
     <div class="flex flex-row h-full w-full max-h-screen">
       <div
-        class="flex w-80 flex-col h-full p-4 bg-sky-950 text-white overflow-x-hidden overflow-y-auto"
+        class="flex w-80 flex-col h-full p-4 bg-sky-950 text-white overflow-x-hidden overflow-y-auto pt-8"
       >
         <div class="flex flex-col w-full h-full justify-between">
           <div class="flex flex-col">
@@ -197,7 +198,7 @@ onBeforeMount(() => {
       </div>
 
       <div
-        class="flex flex-col flex-shrink justify-start w-full h-full p-4 overflow-x-hidden overflow-y-auto bg-gray-900"
+        class="flex flex-col flex-shrink justify-start w-full h-full p-4 overflow-x-hidden overflow-y-auto bg-gray-900 pt-8"
       >
         <loading v-model:active="isLoading" :can-cancel="false" :is-full-page="false" />
         <h2 class="text-xl text-white px-4">Athleteneinblendung</h2>

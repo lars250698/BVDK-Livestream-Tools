@@ -14,6 +14,7 @@ function createWindow(): BrowserWindow {
     minWidth: 1100,
     minHeight: 700,
     show: false,
+    titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
@@ -25,6 +26,20 @@ function createWindow(): BrowserWindow {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+  })
+
+  mainWindow.webContents.setWindowOpenHandler(() => {
+    return {
+      action: 'allow',
+      overrideBrowserWindowOptions: {
+        autoHideMenuBar: true,
+        webPreferences: {
+          preload: join(__dirname, '../preload/index.js'),
+          contextIsolation: false,
+          webSecurity: false
+        }
+      }
+    }
   })
 
   // HMR for renderer base on electron-vite cli.
