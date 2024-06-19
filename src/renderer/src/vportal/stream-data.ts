@@ -1,6 +1,6 @@
 import { activeAthlete, scoreboard } from './queries'
 import { GraphQLClient } from 'graphql-request'
-import { ApplicationState } from '../models/state'
+import { ApplicationState } from '../../../shared/models/state'
 import {
   AttemptStatus,
   CompetitionAthlete,

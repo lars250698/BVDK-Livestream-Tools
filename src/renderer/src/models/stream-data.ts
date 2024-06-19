@@ -1,6 +1,6 @@
 import { AttemptStatus } from './vportal'
 
-interface ScoreboardBase {
+export interface ScoreboardBase {
   name: string
   lot: string
   bodyWeight: string

@@ -4,8 +4,9 @@ import {
   ApplicationState,
   BodyWeightCategory,
   CompetitionGroup,
-  CompetitionStage
-} from '../models/state'
+  CompetitionStage,
+  ScoreboardType
+} from '../../../shared/models/state'
 import { CompetitionDataQueryResult } from '../models/vportal'
 
 async function initState(client: GraphQLClient) {
@@ -30,6 +31,7 @@ async function initState(client: GraphQLClient) {
     selectedCompetitionStageId: availableStages[0].id,
     availableGroups: groups,
     activeGroupIds: activeGroupIds,
+    selectedScoreboardType: ScoreboardType.Overall,
     overallScoreboardSettings: {
       selectedBodyWeightCategoryId: defaultBodyWeightCategory,
       availablePages: defaultBodyWeightCategoryScoreboardPages,
@@ -54,7 +56,7 @@ async function initState(client: GraphQLClient) {
       page: 1,
       pageSize: defaultPageSize
     }
-  }
+  } as ApplicationState
 }
 
 async function refreshCompetitionData(client: GraphQLClient, oldState: ApplicationState) {

@@ -15,17 +15,20 @@ import defaultTemplate from '../../../../examples/templates/lower-thirds.mustach
 import Loading from 'vue-loading-overlay'
 import { ActiveAthleteCustomTemplate } from '../models/stream-data'
 import { AttemptStatus } from '../models/vportal'
-import { CompetitionGroup } from '../models/state'
+import { CompetitionGroup, ScoreboardType } from '../../../shared/models/state'
+import { createClient } from '../vportal/client'
 
 const store = useStore()
 const router = useRouter()
 const toast = useToast()
 const state = computed(() => store.state.applicationState)
-const gqlClient = store.state.gqlClient
+const gqlClient = createClient(store.state.appSettings.vportalUrl, store.state.token)
 const isLoading = ref<boolean>(false)
 
 let customLowerThirdsTemplate = defaultTemplate
 let interval: ReturnType<typeof setTimeout> | undefined = undefined
+
+const bgColor = ref(store.state.colorSettings.bgColor)
 
 const activeGroups = computed(() =>
   state.value.availableGroups.filter((group: CompetitionGroup) =>
@@ -61,9 +64,7 @@ function openLowerThirds() {
     name: 'lower-thirds',
     params: { port: store.state.appSettings.apiPort }
   })
-  const fixedWidth = 1350
-  const fixedHeight = 180
-  window.open(r.href, '_blank', fixedWindowFeatures(fixedWidth, fixedHeight))
+  window.open(r.href, '_blank', fixedWindowFeatures(1350, 180))
 }
 
 function openCustomLowerThirds() {
@@ -74,10 +75,9 @@ function openCustomLowerThirds() {
   )
 }
 
-function openScoreboard(category: string) {
+function openScoreboard() {
   const r = router.resolve({
-    name: `scoreboard-${category}`,
-    params: { port: store.state.appSettings.apiPort }
+    name: `scoreboard`
   })
   window.open(r.href, '_blank', fixedWindowFeatures(1050, 630))
 }
@@ -101,6 +101,34 @@ function refreshStateWithLoadingIndicator() {
 
 function logout() {
   router.push('/logout')
+}
+
+function updateScoreboardSettings(scoreboardType: string) {
+  let settings = undefined
+  switch (scoreboardType) {
+    case 'overall':
+      settings = state.value.overallScoreboardSettings
+      break
+    case 'squat':
+      settings = state.value.squatScoreboardSettings
+      break
+    case 'bench':
+      settings = state.value.benchPressScoreboardSettings
+      break
+    case 'deadlift':
+      settings = state.value.deadliftScoreboardSettings
+      break
+  }
+  if (settings) {
+    store.commit('setScoreboardSettings', {
+      scoreboardType: scoreboardType,
+      scoreboardSettings: settings
+    })
+  }
+}
+
+function updateSelectedScoreboardType() {
+  store.commit('setSelectedScoreboardType', store.state.applicationState.selectedScoreboardType)
 }
 
 async function refreshState() {
@@ -152,7 +180,6 @@ window.livestreamToolsApi.onDeadliftScoreboardRequest(() =>
 onMounted(() => {
   interval = setInterval(refreshState, 10000)
   window.livestreamToolsApi.start(store.state.appSettings.apiPort)
-  console.log(store.state.applicationState)
 })
 
 onUnmounted(() => {
@@ -219,7 +246,17 @@ onBeforeMount(() => {
               </select>
             </div>
           </div>
-          <div class="w-96 m-4"></div>
+          <div class="settings-card">
+            <div class="flex flex-row items-center">
+              <input
+                type="color"
+                class="w-10 h-10 cursor-pointer"
+                v-model="bgColor"
+                @change="store.commit('setBgColor', bgColor)"
+              />
+              <div class="mx-4">Greenscreen Background Color</div>
+            </div>
+          </div>
         </div>
 
         <!-- Scoreboard Settings -->
@@ -234,6 +271,7 @@ onBeforeMount(() => {
                   <select
                     v-model="state.overallScoreboardSettings.selectedBodyWeightCategoryId"
                     class="select"
+                    @change="updateScoreboardSettings('overall')"
                   >
                     <template v-for="group in state.availableGroups">
                       <option
@@ -247,7 +285,11 @@ onBeforeMount(() => {
                   </select>
                 </div>
                 <div class="mr-2">
-                  <select v-model="state.overallScoreboardSettings.page" class="select">
+                  <select
+                    v-model="state.overallScoreboardSettings.page"
+                    class="select"
+                    @change="updateScoreboardSettings('overall')"
+                  >
                     <option v-for="page in overallAvailablePages" :key="page" :value="page">
                       {{ page }}
                     </option>
@@ -272,6 +314,7 @@ onBeforeMount(() => {
                   <select
                     v-model="state.squatScoreboardSettings.selectedBodyWeightCategoryId"
                     class="select"
+                    @change="updateScoreboardSettings('squat')"
                   >
                     <template v-for="group in state.availableGroups">
                       <option
@@ -289,6 +332,7 @@ onBeforeMount(() => {
                     id="squatPage"
                     v-model="state.squatScoreboardSettings.page"
                     class="select"
+                    @change="updateScoreboardSettings('squat')"
                   >
                     <option v-for="page in squatAvailablePages" :key="page" :value="page">
                       {{ page }}
@@ -308,7 +352,7 @@ onBeforeMount(() => {
           </div>
 
           <div class="w-full flex flex-row justify-around">
-            <!-- Overall Scoreboard Settings -->
+            <!-- Bench Scoreboard Settings -->
             <div class="settings-card">
               <h3>Bench Press</h3>
               <div class="flex flex-row my-2">
@@ -322,6 +366,7 @@ onBeforeMount(() => {
                         v-for="category in group.bodyWeightCategories"
                         :key="category.id"
                         :value="category.id"
+                        @change="updateScoreboardSettings('bench')"
                       >
                         {{ category.name }} ({{ category.ageCategoryName }})
                       </option>
@@ -329,7 +374,11 @@ onBeforeMount(() => {
                   </select>
                 </div>
                 <div class="mr-2">
-                  <select v-model="state.benchPressScoreboardSettings.page" class="select">
+                  <select
+                    v-model="state.benchPressScoreboardSettings.page"
+                    class="select"
+                    @change="updateScoreboardSettings('bench')"
+                  >
                     <option v-for="page in benchPressAvailablePages" :key="page" :value="page">
                       {{ page }}
                     </option>
@@ -346,7 +395,7 @@ onBeforeMount(() => {
               </div>
             </div>
 
-            <!-- Squat Scoreboard Settings -->
+            <!-- Deadlift Scoreboard Settings -->
             <div class="settings-card">
               <h3>Deadlift</h3>
               <div class="flex flex-row my-2">
@@ -354,6 +403,7 @@ onBeforeMount(() => {
                   <select
                     v-model="state.deadliftScoreboardSettings.selectedBodyWeightCategoryId"
                     class="select"
+                    @change="updateScoreboardSettings('deadlift')"
                   >
                     <template v-for="group in state.availableGroups">
                       <option
@@ -367,7 +417,11 @@ onBeforeMount(() => {
                   </select>
                 </div>
                 <div class="mr-2">
-                  <select v-model="state.deadliftScoreboardSettings.page" class="select">
+                  <select
+                    v-model="state.deadliftScoreboardSettings.page"
+                    class="select"
+                    @change="updateScoreboardSettings('deadlift')"
+                  >
                     <option v-for="page in deadliftAvailablePages" :key="page" :value="page">
                       {{ page }}
                     </option>
@@ -392,15 +446,16 @@ onBeforeMount(() => {
               <button type="button" class="btn-secondary" @click="openScoreboard('overall')">
                 Scoreboard
               </button>
-              <button type="button" class="btn-secondary" @click="openScoreboard('squat')">
-                Scoreboard Squat
-              </button>
-              <button type="button" class="btn-secondary" @click="openScoreboard('bench')">
-                Scoreboard Bench
-              </button>
-              <button type="button" class="btn-secondary" @click="openScoreboard('deadlift')">
-                Scoreboard Deadlift
-              </button>
+              <select
+                v-model="state.selectedScoreboardType"
+                class="select w-full text-white"
+                @change="updateSelectedScoreboardType"
+              >
+                <option :value="ScoreboardType.Overall">Overall</option>
+                <option :value="ScoreboardType.Squat">Squat</option>
+                <option :value="ScoreboardType.Bench">Benchpress</option>
+                <option :value="ScoreboardType.Deadlift">Deadlift</option>
+              </select>
             </div>
             <div class="flex flex-col w-96 py-4">
               <div class="flex flex-row">
@@ -441,5 +496,21 @@ onBeforeMount(() => {
 
 .file-upload {
   @apply block py-2 me-2 mb-2 w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400;
+}
+
+input[type='color'] {
+  border-radius: 50%;
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  background: none;
+}
+
+input[type='color' i]::-webkit-color-swatch {
+  border-radius: 50%;
+}
+
+input[type='color' i]::-moz-color-swatch {
+  border-radius: 50%;
 }
 </style>

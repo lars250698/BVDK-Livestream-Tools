@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import Loading from 'vue-loading-overlay'
@@ -31,12 +31,8 @@ function login() {
     })
     .then((res) => {
       store.commit('setToken', res.data.token)
-      const gqlClient = createClient(
-        store.state.appSettings.vportalUrl + '/graphql',
-        store.state.token
-      )
-      store.commit('setGqlClient', gqlClient)
-      initState(store.state.gqlClient)
+      const gqlClient = createClient(store.state.appSettings.vportalUrl, store.state.token)
+      initState(gqlClient)
         .then((s) => {
           store.commit('setApplicationState', s)
           router.push('/options')
@@ -49,7 +45,7 @@ function login() {
     })
     .catch((err) => {
       isLoading.value = false
-      if (err.response.status === 401) {
+      if (err?.response?.status === 401) {
         toast.error('Wrong login data!')
       } else {
         toast.error('An error occurred during login.')
@@ -58,29 +54,13 @@ function login() {
     })
 }
 
-function saveSettings() {
-  window.localStorage.setItem('appSettings', JSON.stringify(store.state.appSettings))
-}
-
-function loadSettings() {
-  const savedSettingsJson = window.localStorage.getItem('appSettings')
-  if (savedSettingsJson) {
-    store.state.appSettings = JSON.parse(savedSettingsJson)
-  }
-}
-
 function resetSettings() {
   store.commit('resetAppSettings')
-  saveSettings()
 }
 
-onMounted(() => {
-  loadSettings()
-})
-
-onBeforeUnmount(() => {
-  saveSettings()
-})
+function updateSettings() {
+  store.commit('updateAppSettings', store.state.appSettings)
+}
 </script>
 
 <template>
@@ -125,6 +105,7 @@ onBeforeUnmount(() => {
             v-model="store.state.appSettings.vportalUrl"
             class="input"
             type="url"
+            @change="updateSettings"
           />
         </div>
         <div class="my-2">
@@ -136,6 +117,7 @@ onBeforeUnmount(() => {
             v-model="store.state.appSettings.loginProxyUrl"
             class="input"
             type="url"
+            @change="updateSettings"
           />
         </div>
         <div class="my-2">
@@ -145,6 +127,7 @@ onBeforeUnmount(() => {
             v-model="store.state.appSettings.apiPort"
             class="input"
             type="number"
+            @change="updateSettings"
           />
         </div>
         <div class="my-2">

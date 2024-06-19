@@ -1,17 +1,14 @@
 import {
   createRouter,
   createWebHashHistory,
-  RouteRecordRaw,
+  NavigationGuardNext,
   RouteLocation,
-  NavigationGuardNext
+  RouteRecordRaw
 } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import LivestreamOptionsView from '../views/LivestreamOptionsView.vue'
 import LowerThirds from '../views/LowerThirds.vue'
 import Scoreboard from '../views/Scoreboard.vue'
-import ScoreboardSquat from '../views/ScoreboardSquat.vue'
-import ScoreboardBench from '../views/ScoreboardBench.vue'
-import ScoreboardDeadlift from '../views/ScoreboardDeadlift.vue'
 import Logout from '../views/Logout.vue'
 
 const defaultTitle = 'BVDK Livestream Tools'
@@ -28,28 +25,10 @@ const routes: Array<RouteRecordRaw> = [
     meta: { title: 'Athletenanzeige' }
   },
   {
-    name: 'scoreboard-overall',
-    path: '/scoreboard/overall/:port',
+    name: 'scoreboard',
+    path: '/scoreboard',
     component: Scoreboard,
-    meta: { title: 'Scoreboard overall' }
-  },
-  {
-    name: 'scoreboard-squat',
-    path: '/scoreboard/squat/:port',
-    component: ScoreboardSquat,
-    meta: { title: 'Scoreboard Squat' }
-  },
-  {
-    name: 'scoreboard-bench',
-    path: '/scoreboard/bench/:port',
-    component: ScoreboardBench,
-    meta: { title: 'Scoreboard Bench' }
-  },
-  {
-    name: 'scoreboard-deadlift',
-    path: '/scoreboard/deadlift/:port',
-    component: ScoreboardDeadlift,
-    meta: { title: 'Scoreboard Deadlift' }
+    meta: { title: 'Scoreboard' }
   }
 ]
 
