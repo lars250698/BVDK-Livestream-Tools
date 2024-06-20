@@ -6,6 +6,7 @@ import { useStore } from 'vuex'
 import { GraphQLClient } from 'graphql-request'
 import { getActiveAthlete } from '../vportal/stream-data'
 import { ensureClient } from '../util/state'
+import TransparentWindowControls from '../components/TransparentWindowControls.vue'
 
 const store = useStore()
 const gqlClient: Ref<GraphQLClient | undefined> = ref(undefined)
@@ -68,9 +69,9 @@ onUnmounted(() => {
 
 <template>
   <div
-    class="flex flex-col justify-center align-middle w-full h-full content-center items-center"
-    :style="{ 'background-color': store.state.colorSettings.bgColor }"
+    class="flex flex-col justify-center align-middle w-full h-full content-center items-center bg-opacity-0"
   >
+    <TransparentWindowControls></TransparentWindowControls>
     <div id="container">
       <div class="flex flex-row rounded-lg w-full h-full px-4 py-2 gradient">
         <div class="flex flex-row w-1/2">

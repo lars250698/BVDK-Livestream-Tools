@@ -8,6 +8,7 @@ import ScoreboardBench from '../components/ScoreboardBench.vue'
 import ScoreboardDeadlift from '../components/ScoreboardDeadlift.vue'
 import { ScoreboardType } from '../../../shared/models/state'
 import { ensureClient } from '../util/state'
+import TransparentWindowControls from '../components/TransparentWindowControls.vue'
 
 const store = useStore()
 const gqlClient: Ref<GraphQLClient | undefined> = ref(undefined)
@@ -18,12 +19,9 @@ onMounted(() => {
   })
 })
 </script>
-
 <template>
-  <div
-    class="w-full h-full overflow-hidden"
-    :style="{ 'background-color': store.state.colorSettings.bgColor }"
-  >
+  <div class="w-full h-full overflow-hidden bg-opacity-0">
+    <TransparentWindowControls></TransparentWindowControls>
     <ScoreboardOverall
       v-if="store.state.applicationState.selectedScoreboardType === ScoreboardType.Overall"
       :gql-client="gqlClient"

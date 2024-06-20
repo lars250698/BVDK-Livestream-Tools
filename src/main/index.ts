@@ -6,15 +6,16 @@ import livestreamToolsApi from './livestreamToolsApi'
 import * as http from 'http'
 import { StateHolder } from './state'
 import { State } from '../shared/models/state'
-import IpcMainEvent = Electron.IpcMainEvent
 import {
   clearCredentials,
   credentialsAvailable,
   credentialsStorageAvailable,
   loadCredentials,
   saveCredentials
-} from "./credentials";
-import { Credentials } from "../shared/models/credentials";
+} from './credentials'
+import { Credentials } from '../shared/models/credentials'
+import IpcMainEvent = Electron.IpcMainEvent
+import IpcMainInvokeEvent = Electron.IpcMainInvokeEvent
 
 let stateHolder: StateHolder | undefined
 
@@ -27,6 +28,7 @@ function createWindow(): BrowserWindow {
     minHeight: 700,
     show: false,
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
+    frame: process.platform !== 'darwin',
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
@@ -45,6 +47,8 @@ function createWindow(): BrowserWindow {
       action: 'allow',
       overrideBrowserWindowOptions: {
         autoHideMenuBar: true,
+        transparent: true,
+        frame: false,
         webPreferences: {
           preload: join(__dirname, '../preload/index.js'),
           contextIsolation: false,
@@ -126,6 +130,9 @@ app.whenReady().then(() => {
         window.close()
       }
     })
+  })
+  ipcMain.handle('is-main-window', async (event: IpcMainInvokeEvent) => {
+    return event.sender.id === mainWindow.id
   })
 
   app.on('activate', function () {

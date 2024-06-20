@@ -100,7 +100,14 @@ onMounted(() => {
 
 <template>
   <div class="flex w-full h-full bg-sky-950 text-white">
-    <loading v-model:active="isLoading" :can-cancel="false" :is-full-page="true" :opacity="1" :background-color="'#082f49'" :color="'#9ca3af'"/>
+    <loading
+      v-model:active="isLoading"
+      :can-cancel="false"
+      :is-full-page="true"
+      :opacity="1"
+      :background-color="'#082f49'"
+      :color="'#9ca3af'"
+    />
     <div class="w-full h-full flex flex-row justify-around">
       <div class="w-1/3 p-4 h-full flex flex-col justify-center">
         <form class="flex flex-col">

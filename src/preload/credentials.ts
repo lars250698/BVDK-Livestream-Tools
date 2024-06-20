@@ -1,5 +1,5 @@
-import { Credentials } from "../shared/models/credentials";
-import { ipcRenderer } from "electron";
+import { Credentials } from '../shared/models/credentials'
+import { ipcRenderer } from 'electron'
 
 export interface ICredentials {
   available: () => Promise<boolean>
