@@ -7,6 +7,14 @@ import * as http from 'http'
 import { StateHolder } from './state'
 import { State } from '../shared/models/state'
 import IpcMainEvent = Electron.IpcMainEvent
+import {
+  clearCredentials,
+  credentialsAvailable,
+  credentialsStorageAvailable,
+  loadCredentials,
+  saveCredentials
+} from "./credentials";
+import { Credentials } from "../shared/models/credentials";
 
 let stateHolder: StateHolder | undefined
 
@@ -103,6 +111,7 @@ app.whenReady().then(() => {
   })
 
   stateHolder = createStateHolder()
+  createCredentialsStorage()
   const mainWindow = createWindow()
 
   let expressApp: http.Server | null = null

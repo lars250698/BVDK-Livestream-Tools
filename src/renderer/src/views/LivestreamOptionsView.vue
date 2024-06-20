@@ -52,7 +52,6 @@ const isMac = computed(() => {
   return window.util.getPlatform() === 'darwin'
 })
 
-
 async function handleFileUpload($event: Event) {
   const reader = new FileReader()
   reader.onload = (e) => {
@@ -106,6 +105,7 @@ function refreshStateWithLoadingIndicator() {
 
 function logout() {
   router.push('/logout')
+  window.credentials.clear()
   window.util.closeAllWindowsExceptMain()
 }
 
@@ -205,7 +205,7 @@ onBeforeMount(() => {
     <div class="flex flex-row h-full w-full max-h-screen">
       <div
         class="flex w-80 flex-col h-full p-4 bg-sky-950 text-white overflow-x-hidden overflow-y-auto"
-        :class="{ 'pt-8': isMac }"
+        :class="{ 'pt-10': isMac }"
       >
         <div class="flex flex-col w-full h-full justify-between">
           <div class="flex flex-col">
@@ -253,12 +253,12 @@ onBeforeMount(() => {
               </select>
             </div>
           </div>
-          <div class="settings-card">
+          <div class="settings-card justify-center">
             <div class="flex flex-row items-center">
               <input
-                type="color"
-                class="w-10 h-10 cursor-pointer"
                 v-model="bgColor"
+                type="color"
+                class="w-9 h-9 cursor-pointer"
                 @change="store.commit('setBgColor', bgColor)"
               />
               <div class="mx-4">Greenscreen Background Color</div>
@@ -291,7 +291,7 @@ onBeforeMount(() => {
                     </template>
                   </select>
                 </div>
-                <div class="mr-2">
+                <div class="mr-2 w-14">
                   <select
                     v-model="state.overallScoreboardSettings.page"
                     class="select"
@@ -334,7 +334,7 @@ onBeforeMount(() => {
                     </template>
                   </select>
                 </div>
-                <div class="mr-2">
+                <div class="mr-2 w-14">
                   <select
                     id="squatPage"
                     v-model="state.squatScoreboardSettings.page"
@@ -380,7 +380,7 @@ onBeforeMount(() => {
                     </template>
                   </select>
                 </div>
-                <div class="mr-2">
+                <div class="mr-2 w-14">
                   <select
                     v-model="state.benchPressScoreboardSettings.page"
                     class="select"
@@ -423,7 +423,7 @@ onBeforeMount(() => {
                     </template>
                   </select>
                 </div>
-                <div class="mr-2">
+                <div class="mr-2 w-14">
                   <select
                     v-model="state.deadliftScoreboardSettings.page"
                     class="select"
