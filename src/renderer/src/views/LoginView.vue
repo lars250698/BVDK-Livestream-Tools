@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import Loading from 'vue-loading-overlay'
@@ -8,6 +8,7 @@ import axios from 'axios'
 import { initState } from '../vportal/state-actions'
 import { createClient } from '../vportal/client'
 import { useToast } from 'vue-toastification'
+import { Credentials } from '../../../shared/models/credentials'
 
 const store = useStore()
 const router = useRouter()
@@ -17,6 +18,7 @@ const input = ref({
   identity: '',
   credential: ''
 })
+const saveCredentials = ref(false)
 const isLoading = ref(false)
 
 function login() {
@@ -30,6 +32,9 @@ function login() {
       }
     })
     .then((res) => {
+      if (saveCredentials.value) {
+        saveLoginInfo()
+      }
       store.commit('setToken', res.data.token)
       const gqlClient = createClient(store.state.appSettings.vportalUrl, store.state.token)
       initState(gqlClient)
@@ -54,6 +59,17 @@ function login() {
     })
 }
 
+function saveLoginInfo() {
+  window.credentials.storageAvailable().then((storageAvailable) => {
+    if (storageAvailable) {
+      window.credentials.write({
+        identity: input.value.identity,
+        credential: input.value.credential
+      } as Credentials)
+    }
+  })
+}
+
 function resetSettings() {
   store.commit('resetAppSettings')
 }
@@ -61,11 +77,30 @@ function resetSettings() {
 function updateSettings() {
   store.commit('updateAppSettings', store.state.appSettings)
 }
+
+onMounted(() => {
+  window.credentials
+    .available()
+    .then((available) => {
+      if (available) {
+        window.credentials
+          .load()
+          .then((credentials: Credentials) => {
+            input.value.identity = credentials.identity
+            input.value.credential = credentials.credential
+            saveCredentials.value = true
+            login()
+          })
+          .catch((err) => console.error(err))
+      }
+    })
+    .catch((err) => console.error(err))
+})
 </script>
 
 <template>
   <div class="flex w-full h-full bg-sky-950 text-white">
-    <loading v-model:active="isLoading" :can-cancel="false" :is-full-page="true" />
+    <loading v-model:active="isLoading" :can-cancel="false" :is-full-page="true" :opacity="1" :background-color="'#082f49'" :color="'#9ca3af'"/>
     <div class="w-full h-full flex flex-row justify-around">
       <div class="w-1/3 p-4 h-full flex flex-col justify-center">
         <form class="flex flex-col">
@@ -90,6 +125,19 @@ function updateSettings() {
               placeholder="Enter your password"
               required
             />
+          </div>
+          <div class="flex items-center my-2">
+            <input
+              id="save-login"
+              v-model="saveCredentials"
+              type="checkbox"
+              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+            />
+            <label
+              for="save-login"
+              class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+              >Save login</label
+            >
           </div>
           <div class="my-4">
             <button type="button" class="btn-primary w-full" @click.prevent="login">Log In</button>
