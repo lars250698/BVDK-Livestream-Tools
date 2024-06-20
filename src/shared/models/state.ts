@@ -37,6 +37,7 @@ export interface ApplicationState {
   benchPressScoreboardSettings: ScoreboardSettings
   deadliftScoreboardSettings: ScoreboardSettings
   selectedScoreboardType: ScoreboardType
+  upcomingAttemptAmount: number
 }
 
 export const enum ScoreboardType {

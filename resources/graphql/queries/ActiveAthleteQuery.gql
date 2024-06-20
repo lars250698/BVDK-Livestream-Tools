@@ -2,6 +2,8 @@ query activeAthleteQuery($competitionId: ID!, $params: CompetitionAthleteAttempt
   competitionAthleteAttemptList(competitionId: $competitionId, params: $params) {
     competitionAthleteAttempts {
       discipline
+      attempt
+      weight
       competitionAthlete {
         id
         firstName

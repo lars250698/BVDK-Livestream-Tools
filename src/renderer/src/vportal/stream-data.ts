@@ -10,6 +10,7 @@ import {
 } from '../models/vportal'
 import {
   ActiveAthlete,
+  AthleteAttemptData,
   BenchScoreboardEntry,
   DeadliftScoreboardEntry,
   OverallScoreboardEntry,
@@ -256,6 +257,41 @@ async function getDeadliftScoreboard(
   )
 }
 
+async function getUpcomingAttempts(
+  client: GraphQLClient,
+  state: ApplicationState
+): Promise<Array<AthleteAttemptData>> {
+  const queryResult = await activeAthlete(
+    client,
+    state.competitionId,
+    state.selectedCompetitionStageId
+  )
+  if (!queryResult.competitionAthleteAttemptList.competitionAthleteAttempts) {
+    return []
+  }
+  const activeDiscipline =
+    queryResult.competitionAthleteAttemptList.competitionAthleteAttempts[0].discipline
+  const subset = queryResult.competitionAthleteAttemptList.competitionAthleteAttempts
+    .slice(0, state.upcomingAttemptAmount)
+    .filter((attempt) => attempt.discipline === activeDiscipline)
+  const res = subset.map((attemptData) => {
+    return {
+      name: `${attemptData.competitionAthlete.firstName} ${attemptData.competitionAthlete.lastName}`,
+      attempt: attemptData.attempt.toString(),
+      weight: prettyPrintWeight(attemptData.weight, '')
+    } as AthleteAttemptData
+  })
+  return padToSize(
+    res,
+    {
+      name: '',
+      attempt: '',
+      weight: ''
+    } as AthleteAttemptData,
+    state.upcomingAttemptAmount
+  )
+}
+
 async function getActiveAthlete(
   client: GraphQLClient,
   state: ApplicationState
@@ -388,9 +424,9 @@ function prettyPrintLot(lot?: number): string {
   return lot.toString()
 }
 
-function prettyPrintWeight(weight?: number): string {
+function prettyPrintWeight(weight?: number, defaultVal: string = '0'): string {
   if (!weight) {
-    return '0'
+    return defaultVal
   }
   if (weight % 1 === 0) {
     return weight.toString()

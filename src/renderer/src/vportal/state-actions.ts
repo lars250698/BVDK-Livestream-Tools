@@ -32,6 +32,7 @@ async function initState(client: GraphQLClient) {
     availableGroups: groups,
     activeGroupIds: activeGroupIds,
     selectedScoreboardType: ScoreboardType.Overall,
+    upcomingAttemptAmount: 5,
     overallScoreboardSettings: {
       selectedBodyWeightCategoryId: defaultBodyWeightCategory,
       availablePages: defaultBodyWeightCategoryScoreboardPages,
