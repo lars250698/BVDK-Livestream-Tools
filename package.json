@@ -1,7 +1,7 @@
 {
   "name": "blt",
-  "version": "0.5.0",
-  "description": "An Electron application with Vue",
+  "version": "0.6.0",
+  "description": "Livestream Goodies",
   "main": "./out/main/index.js",
   "author": "eppinger.dev",
   "homepage": "https://electron-vite.org",
