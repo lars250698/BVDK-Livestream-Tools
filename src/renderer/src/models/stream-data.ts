@@ -34,6 +34,12 @@ export interface DeadliftScoreboardEntry extends BenchScoreboardEntry {
   bestBench: string
 }
 
+export interface AthleteAttemptData {
+  name: string
+  attempt: string
+  weight: string
+}
+
 export interface ActiveAthlete {
   name: string
   club: string

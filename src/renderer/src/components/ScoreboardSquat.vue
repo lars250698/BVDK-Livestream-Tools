@@ -83,7 +83,7 @@ onUnmounted(() => {
       <div
         v-for="(athlete, idx) in athletes"
         :key="idx"
-        class="flex flex-col w-full h-8 even:bg-gray-700 odd:bg-gray-500"
+        class="flex flex-col w-full h-8 even:bg-gray-700 odd:bg-gray-500 opacity-80"
       >
         <div class="flex flex-row w-full h-full px-2 justify-between text-white items-center">
           <div class="flex flex-row justify-between w-4/5 h-full items-center">

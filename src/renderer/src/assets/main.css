@@ -11,3 +11,9 @@
     rgba(190, 0, 7, 1) 100%
   );
 }
+
+.draggable {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-app-region: drag;
+}

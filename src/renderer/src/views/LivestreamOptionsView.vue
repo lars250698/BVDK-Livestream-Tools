@@ -68,7 +68,7 @@ function openLowerThirds() {
     name: 'lower-thirds',
     params: { port: store.state.appSettings.apiPort }
   })
-  window.open(r.href, '_blank', fixedWindowFeatures(1350, 180))
+  window.open(r.href, '_blank', fixedWindowFeatures(1500, 300))
 }
 
 function openCustomLowerThirds() {
@@ -253,17 +253,7 @@ onBeforeMount(() => {
               </select>
             </div>
           </div>
-          <div class="settings-card justify-center">
-            <div class="flex flex-row items-center">
-              <input
-                v-model="bgColor"
-                type="color"
-                class="w-9 h-9 cursor-pointer"
-                @change="store.commit('setBgColor', bgColor)"
-              />
-              <div class="mx-4">Greenscreen Background Color</div>
-            </div>
-          </div>
+          <div class="flex flex-col w-96 p-4 m-4"></div>
         </div>
 
         <!-- Scoreboard Settings -->

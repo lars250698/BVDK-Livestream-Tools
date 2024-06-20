@@ -49,6 +49,8 @@ export interface ActiveAthleteQueryResult {
       | [
           {
             discipline: Discipline
+            attempt: number
+            weight: number | undefined
             competitionAthlete: CompetitionAthlete
           }
         ]
