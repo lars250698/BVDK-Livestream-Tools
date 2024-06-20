@@ -1,9 +1,9 @@
 {
-  "name": "bvdk-livestream-tools",
+  "name": "blt",
   "version": "0.5.0",
   "description": "An Electron application with Vue",
   "main": "./out/main/index.js",
-  "author": "example.com",
+  "author": "eppinger.dev",
   "homepage": "https://electron-vite.org",
   "scripts": {
     "format": "prettier --write .",

@@ -1,6 +1,6 @@
 # Custom Templates
 
-BVDK Livestream Tools allows you to use custom templates for your stream assets.
+BLT allows you to use custom templates for your stream assets.
 Currently, only the athlete lower thirds can be customized,
 but in the future the scoreboards with also be available to customize.
 
@@ -12,7 +12,7 @@ Click the adjacent button and a new Window will open with your custom stream ass
 ## Building custom templates
 
 Custom templates are built in [Mustache](https://mustache.github.io/).
-BVDK Livestream tools exposes all relevant fields to build your own templates (see reference below).
+BLT exposes all relevant fields to build your own templates (see reference below).
 When using custom templates, they get rendered server-side.
 This means that the data does not refresh automatically, you will need to reload the page via JavaScript,
 which can be done by adding this code snippet inside the `html` tag in your template:

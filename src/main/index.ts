@@ -78,12 +78,22 @@ function createStateHolder(): StateHolder {
   return stateHolder
 }
 
+function createCredentialsStorage() {
+  ipcMain.handle('credentials-available', credentialsAvailable)
+  ipcMain.handle('credentials-storage-available', credentialsStorageAvailable)
+  ipcMain.on('save-credentials', (_: IpcMainEvent, credentials: Credentials) => {
+    saveCredentials(credentials)
+  })
+  ipcMain.handle('load-credentials', loadCredentials)
+  ipcMain.on('clear-credentials', clearCredentials)
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId('dev.eppinger.blt')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.

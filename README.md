@@ -1,7 +1,13 @@
-# BVDK Livestream Tools
+# BLT
 
 This application provides a better way to control livestream assets for Powerlifting competitions
-in the German IPF affiliate, the [BVDK](https://bvdk.de/).
+in the largest German tested Powerlifting federation.
+
+## DISCLAIMER
+
+This tool is **NOT OFFICIALLY SUPPORTED** by the BVDK.
+Any problems, bugs and feature requests are to be directed towards the author of this repository.
+If you experience any problems, please raise an issue in this repository or contact the author directly.
 
 ## Prerequesites
 

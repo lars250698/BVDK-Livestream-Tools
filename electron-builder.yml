@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: bvdk-livestream-tools
+appId: dev.eppinger.blt
+productName: BLT
 directories:
   buildResources: build
 files:
@@ -11,7 +11,7 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: bvdk-livestream-tools
+  executableName: BLT
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
@@ -39,6 +39,6 @@ npmRebuild: false
 publish:
   provider: github
   owner: lars250698
-  repo: BVDK-Livestream-Tools
+  repo: BLT
   releaseType: draft
   protocol: https

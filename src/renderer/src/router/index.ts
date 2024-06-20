@@ -11,7 +11,7 @@ import LowerThirds from '../views/LowerThirds.vue'
 import Scoreboard from '../views/Scoreboard.vue'
 import Logout from '../views/Logout.vue'
 
-const defaultTitle = 'BVDK Livestream Tools'
+const defaultTitle = 'BLT'
 
 const routes: Array<RouteRecordRaw> = [
   { name: 'entry', path: '/', redirect: '/login' },
