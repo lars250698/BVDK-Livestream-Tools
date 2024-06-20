@@ -48,6 +48,11 @@ const deadliftAvailablePages = computed(() =>
   Array.from({ length: state.value.deadliftScoreboardSettings.availablePages }, (_, i) => i + 1)
 )
 
+const isMac = computed(() => {
+  return window.util.getPlatform() === 'darwin'
+})
+
+
 async function handleFileUpload($event: Event) {
   const reader = new FileReader()
   reader.onload = (e) => {
@@ -101,6 +106,7 @@ function refreshStateWithLoadingIndicator() {
 
 function logout() {
   router.push('/logout')
+  window.util.closeAllWindowsExceptMain()
 }
 
 function updateScoreboardSettings(scoreboardType: string) {
@@ -198,7 +204,8 @@ onBeforeMount(() => {
   <div class="flex flex-col w-full h-full">
     <div class="flex flex-row h-full w-full max-h-screen">
       <div
-        class="flex w-80 flex-col h-full p-4 bg-sky-950 text-white overflow-x-hidden overflow-y-auto pt-8"
+        class="flex w-80 flex-col h-full p-4 bg-sky-950 text-white overflow-x-hidden overflow-y-auto"
+        :class="{ 'pt-8': isMac }"
       >
         <div class="flex flex-col w-full h-full justify-between">
           <div class="flex flex-col">

@@ -93,14 +93,21 @@ app.whenReady().then(() => {
   })
 
   stateHolder = createStateHolder()
-  const win = createWindow()
+  const mainWindow = createWindow()
 
   let expressApp: http.Server | null = null
   ipcMain.on(
     'start-api',
-    (_: IpcMainEvent, args) => (expressApp = livestreamToolsApi(win, args.port))
+    (_: IpcMainEvent, args) => (expressApp = livestreamToolsApi(mainWindow, args.port))
   )
   ipcMain.on('stop-api', () => expressApp?.close())
+  ipcMain.on('close-all-windows-except-main', () => {
+    BrowserWindow.getAllWindows().forEach((window) => {
+      if (window.id !== mainWindow.id) {
+        window.close()
+      }
+    })
+  })
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

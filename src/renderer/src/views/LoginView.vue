@@ -96,7 +96,7 @@ function updateSettings() {
           </div>
         </form>
       </div>
-      <div class="border-r border-white"></div>
+      <div class="border-r border-gray-600"></div>
       <div class="flex flex-col w-1/3 justify-center">
         <div class="my-2">
           <label for="vportal-url" class="label">Vereinsportal URL</label>
