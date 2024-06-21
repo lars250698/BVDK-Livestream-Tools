@@ -1,6 +1,5 @@
 <script setup lang="ts">
 function close() {
-  console.log('test')
   window.close()
 }
 </script>

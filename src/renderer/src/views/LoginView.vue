@@ -140,9 +140,7 @@ onMounted(() => {
               type="checkbox"
               class="w-4 h-4 text-blue-600 rounded focus:ring-blue-600 ring-offset-gray-800 focus:ring-2 bg-gray-700 border-gray-600"
             />
-            <label
-              for="save-login"
-              class="ms-2 text-sm font-medium text-gray-300"
+            <label for="save-login" class="ms-2 text-sm font-medium text-gray-300"
               >Save login</label
             >
           </div>
