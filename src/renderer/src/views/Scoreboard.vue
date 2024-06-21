@@ -22,26 +22,35 @@ onMounted(() => {
 <template>
   <div class="w-full h-full overflow-hidden bg-opacity-0">
     <TransparentWindowControls></TransparentWindowControls>
-    <ScoreboardOverall
-      v-if="store.state.applicationState.selectedScoreboardType === ScoreboardType.Overall"
-      :gql-client="gqlClient"
-      :state="store.state"
-    />
-    <ScoreboardSquat
-      v-if="store.state.applicationState.selectedScoreboardType === ScoreboardType.Squat"
-      :gql-client="gqlClient"
-      :state="store.state"
-    />
-    <ScoreboardBench
-      v-if="store.state.applicationState.selectedScoreboardType === ScoreboardType.Bench"
-      :gql-client="gqlClient"
-      :state="store.state"
-    />
-    <ScoreboardDeadlift
-      v-if="store.state.applicationState.selectedScoreboardType === ScoreboardType.Deadlift"
-      :gql-client="gqlClient"
-      :state="store.state"
-    />
+    <div class="flex mx-auto" style="width: 1000px; height: 600px">
+      <div class="flex flex-col justify-start w-full h-full">
+        <div class="flex w-full gradient h-16 my-2">
+          <div class="flex flex-row w-full h-full justify-start items-center px-4">
+            <div class="text-white text-4xl">Ergebnisse</div>
+          </div>
+        </div>
+        <ScoreboardOverall
+          v-if="store.state.applicationState.selectedScoreboardType === ScoreboardType.Overall"
+          :gql-client="gqlClient"
+          :state="store.state"
+        />
+        <ScoreboardSquat
+          v-if="store.state.applicationState.selectedScoreboardType === ScoreboardType.Squat"
+          :gql-client="gqlClient"
+          :state="store.state"
+        />
+        <ScoreboardBench
+          v-if="store.state.applicationState.selectedScoreboardType === ScoreboardType.Bench"
+          :gql-client="gqlClient"
+          :state="store.state"
+        />
+        <ScoreboardDeadlift
+          v-if="store.state.applicationState.selectedScoreboardType === ScoreboardType.Deadlift"
+          :gql-client="gqlClient"
+          :state="store.state"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
