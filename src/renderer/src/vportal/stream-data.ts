@@ -45,11 +45,11 @@ async function getOverallScoreboard(
         name: `${athlete.firstName} ${athlete.lastName}`,
         lot: prettyPrintLot(athlete.lot),
         bodyWeight: prettyPrintWeight(athlete.bodyWeight),
-        total: prettyPrintWeight(athlete.calcTotal),
-        prognosis: prettyPrintWeight(calculatePrognosis(athlete)),
-        bestSquat: prettyPrintWeight(athlete.squatTotal),
-        bestBench: prettyPrintWeight(athlete.benchPressTotal),
-        bestDeadlift: prettyPrintWeight(athlete.deadliftTotal)
+        total: prettyPrintWeight(athlete.calcTotal, '0'),
+        prognosis: prettyPrintWeight(calculatePrognosis(athlete), '0'),
+        bestSquat: prettyPrintWeight(athlete.squatTotal, '0'),
+        bestBench: prettyPrintWeight(athlete.benchPressTotal, '0'),
+        bestDeadlift: prettyPrintWeight(athlete.deadliftTotal, '0')
       }
     }) ?? []
   return padToSize(
@@ -92,8 +92,8 @@ async function getSquatScoreboard(
         name: `${athlete.firstName} ${athlete.lastName}`,
         lot: '' + athlete.lot,
         bodyWeight: prettyPrintWeight(athlete.bodyWeight),
-        total: prettyPrintWeight(athlete.calcTotal),
-        prognosis: prettyPrintWeight(calculatePrognosis(athlete)),
+        total: prettyPrintWeight(athlete.calcTotal, '0'),
+        prognosis: prettyPrintWeight(calculatePrognosis(athlete), '0'),
         attempt1: prettyPrintWeight(attempts[0].weight),
         attempt2: prettyPrintWeight(attempts[1].weight),
         attempt3: prettyPrintWeight(attempts[2].weight),
@@ -152,9 +152,9 @@ async function getBenchScoreboard(
         name: `${athlete.firstName} ${athlete.lastName}`,
         lot: '' + athlete.lot,
         bodyWeight: prettyPrintWeight(athlete.bodyWeight),
-        total: prettyPrintWeight(athlete.calcTotal),
-        prognosis: prettyPrintWeight(calculatePrognosis(athlete)),
-        bestSquat: prettyPrintWeight(athlete.squatTotal),
+        total: prettyPrintWeight(athlete.calcTotal, '0'),
+        prognosis: prettyPrintWeight(calculatePrognosis(athlete), '0'),
+        bestSquat: prettyPrintWeight(athlete.squatTotal, '0'),
         attempt1: prettyPrintWeight(attempts[0].weight),
         attempt2: prettyPrintWeight(attempts[1].weight),
         attempt3: prettyPrintWeight(attempts[2].weight),
@@ -217,10 +217,10 @@ async function getDeadliftScoreboard(
         name: `${athlete.firstName} ${athlete.lastName}`,
         lot: '' + athlete.lot,
         bodyWeight: prettyPrintWeight(athlete.bodyWeight),
-        total: prettyPrintWeight(athlete.calcTotal),
-        prognosis: prettyPrintWeight(calculatePrognosis(athlete)),
-        bestSquat: prettyPrintWeight(athlete.squatTotal),
-        bestBench: prettyPrintWeight(athlete.benchPressTotal),
+        total: prettyPrintWeight(athlete.calcTotal, '0'),
+        prognosis: prettyPrintWeight(calculatePrognosis(athlete), '0'),
+        bestSquat: prettyPrintWeight(athlete.squatTotal, '0'),
+        bestBench: prettyPrintWeight(athlete.benchPressTotal, '0'),
         attempt1: prettyPrintWeight(attempts[0].weight),
         attempt2: prettyPrintWeight(attempts[1].weight),
         attempt3: prettyPrintWeight(attempts[2].weight),
@@ -282,12 +282,12 @@ async function getActiveAthlete(
       club: athlete.club.name,
       activeLift: prettyPrintDiscipline(activeAttempt.discipline),
       compClass: `${athlete.ageCategory.name} ${athlete.bodyWeightCategory.name}`,
-      total: prettyPrintWeight(athlete.calcTotal),
-      prognosis: prettyPrintWeight(calculatePrognosis(athlete)),
+      total: prettyPrintWeight(athlete.calcTotal, '0'),
+      prognosis: prettyPrintWeight(calculatePrognosis(athlete), '0'),
       placement: getPlacement(athlete.id, scoreboardResult),
-      bestSquat: prettyPrintWeight(athlete.squatTotal),
-      bestBench: prettyPrintWeight(athlete.benchPressTotal),
-      bestDeadlift: prettyPrintWeight(athlete.deadliftTotal),
+      bestSquat: prettyPrintWeight(athlete.squatTotal, '0'),
+      bestBench: prettyPrintWeight(athlete.benchPressTotal, '0'),
+      bestDeadlift: prettyPrintWeight(athlete.deadliftTotal, '0'),
       attempt1: prettyPrintWeight(attempts[0].weight),
       attempt2: prettyPrintWeight(attempts[1].weight),
       attempt3: prettyPrintWeight(attempts[2].weight),
@@ -388,9 +388,9 @@ function prettyPrintLot(lot?: number): string {
   return lot.toString()
 }
 
-function prettyPrintWeight(weight?: number): string {
+function prettyPrintWeight(weight?: number, defaultVal: string = ''): string {
   if (!weight) {
-    return '0'
+    return defaultVal
   }
   if (weight % 1 === 0) {
     return weight.toString()
@@ -414,7 +414,7 @@ function getPlacement(athleteId: string, scoreboard: ScoreboardQueryResult): str
     ?.map((athlete) => athlete.id)
     ?.indexOf(athleteId)
   const placement = idx ? idx + 1 : undefined
-  return placement ? placement.toString() : ''
+  return placement ? placement.toString() : '-'
 }
 
 function filterAndSortAttempts(attempts: Array<CompetitionAthleteAttempt>, discipline: Discipline) {

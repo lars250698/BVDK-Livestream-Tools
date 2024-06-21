@@ -21,6 +21,7 @@ let stateHolder: StateHolder | undefined
 
 function createWindow(): BrowserWindow {
   // Create the browser window.
+  console.log('Hello World')
   const mainWindow = new BrowserWindow({
     width: 1150,
     height: 900,
