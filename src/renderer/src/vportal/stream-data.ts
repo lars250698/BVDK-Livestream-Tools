@@ -1,4 +1,4 @@
-import { activeAthlete, scoreboard } from './queries'
+import { activeAthlete, activeGroupsOnStage, scoreboard } from './queries'
 import { GraphQLClient } from 'graphql-request'
 import { ApplicationState } from '../../../shared/models/state'
 import {
@@ -260,11 +260,36 @@ async function getActiveAthlete(
   client: GraphQLClient,
   state: ApplicationState
 ): Promise<ActiveAthlete> {
-  const queryResult = await activeAthlete(
+  const empty = {
+    name: '',
+    club: '',
+    activeLift: '',
+    compClass: '',
+    total: '',
+    prognosis: '',
+    placement: '',
+    bestSquat: '',
+    bestBench: '',
+    bestDeadlift: '',
+    attempt1: '',
+    attempt2: '',
+    attempt3: '',
+    attemptColor1: colorInvisible,
+    attemptColor2: colorInvisible,
+    attemptColor3: colorInvisible,
+    attemptStatus1: AttemptStatus.Open,
+    attemptStatus2: AttemptStatus.Open,
+    attemptStatus3: AttemptStatus.Open
+  }
+  const groups = await activeGroupsOnStage(
     client,
     state.competitionId,
     state.selectedCompetitionStageId
   )
+  if (!groups) {
+    return empty
+  }
+  const queryResult = await activeAthlete(client, state.competitionId, groups)
   const activeAttempt = queryResult.competitionAthleteAttemptList?.competitionAthleteAttempts?.[0]
   const athlete = activeAttempt?.competitionAthlete
   if (athlete && activeAttempt) {
@@ -299,27 +324,7 @@ async function getActiveAthlete(
       attemptStatus3: attempts[2].status
     }
   }
-  return {
-    name: '',
-    club: '',
-    activeLift: '',
-    compClass: '',
-    total: '',
-    prognosis: '',
-    placement: '',
-    bestSquat: '',
-    bestBench: '',
-    bestDeadlift: '',
-    attempt1: '',
-    attempt2: '',
-    attempt3: '',
-    attemptColor1: colorInvisible,
-    attemptColor2: colorInvisible,
-    attemptColor3: colorInvisible,
-    attemptStatus1: AttemptStatus.Open,
-    attemptStatus2: AttemptStatus.Open,
-    attemptStatus3: AttemptStatus.Open
-  }
+  return empty
 }
 
 function calculatePrognosis(athlete: CompetitionAthlete) {

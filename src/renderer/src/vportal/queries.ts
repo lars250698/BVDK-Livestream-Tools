@@ -4,6 +4,7 @@ import stageListQuery from '../../../../resources/graphql/queries/StageListQuery
 import competitionDataQuery from '../../../../resources/graphql/queries/CompetitionDataQuery.gql?raw'
 import scoreboardQuery from '../../../../resources/graphql/queries/ScoreboardQuery.gql?raw'
 import activeAthleteQuery from '../../../../resources/graphql/queries/ActiveAthleteQuery.gql?raw'
+import activeGroupsOnStageQuery from '../../../../resources/graphql/queries/ActiveGroupsOnStageQuery.gql?raw'
 import { gql, GraphQLClient } from 'graphql-request'
 import {
   ActiveAthleteQueryResult,
@@ -12,16 +13,39 @@ import {
   StageListQueryResult
 } from '../models/vportal'
 
+async function activeGroupsOnStage(
+  client: GraphQLClient,
+  competitionId: string,
+  stageId: string
+): Promise<Array<string>> {
+  const params = {
+    competitionId: competitionId,
+    params: {
+      filter: {
+        competitionStageId: stageId,
+        active: true
+      }
+    }
+  }
+  const res = await client.request(
+    gql`
+      ${activeGroupsOnStageQuery}
+    `,
+    params
+  )
+  return res.competition.competitionGroupList?.competitionGroups.map((group) => group.id)
+}
+
 async function activeAthlete(
   client: GraphQLClient,
   competitionId: string,
-  competitionStageId: string
+  competitionGroupIds: Array<string>
 ): Promise<ActiveAthleteQueryResult> {
   const params = {
     competitionId: competitionId,
     params: {
       filter: {
-        competitionStageId: competitionStageId
+        competitionGroupId: competitionGroupIds
       }
     }
   }
@@ -109,4 +133,12 @@ async function scoreboard(
   )
 }
 
-export { activeGroup, profileCompetition, stageList, competitionData, scoreboard, activeAthlete }
+export {
+  activeGroup,
+  profileCompetition,
+  stageList,
+  competitionData,
+  scoreboard,
+  activeAthlete,
+  activeGroupsOnStage
+}

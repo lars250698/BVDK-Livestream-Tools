@@ -1,0 +1,9 @@
+query Competition($competitionId: ID!, $params: CompetitionGroupListParams) {
+  competition(competitionId: $competitionId) {
+    competitionGroupList(params: $params) {
+      competitionGroups {
+        id
+      }
+    }
+  }
+}
