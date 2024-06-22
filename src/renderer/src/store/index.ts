@@ -5,6 +5,7 @@ import {
   defaultAppSettings,
   defaultColorSettings,
   ScoreboardSettings,
+  ScoreboardSettingsType,
   ScoreboardType,
   State
 } from '../../../shared/models/state'
@@ -43,23 +44,32 @@ const mutations = {
   },
   setScoreboardSettings(
     state: State,
-    params: { scoreboardSettings: ScoreboardSettings; scoreboardType: string }
+    params: {
+      scoreboardSettings: ScoreboardSettings
+      scoreboardSettingsType: ScoreboardSettingsType
+    }
   ) {
     if (!state.applicationState) {
       console.error('Trying to set Scoreboard settings while no state has been initialized')
       return
     }
-    switch (params.scoreboardType) {
-      case 'overall':
+    switch (params.scoreboardSettingsType) {
+      case ScoreboardSettingsType.Overall:
         state.applicationState.overallScoreboardSettings = params.scoreboardSettings
         break
-      case 'squat':
+      case ScoreboardSettingsType.Squat:
         state.applicationState.squatScoreboardSettings = params.scoreboardSettings
         break
-      case 'bench':
+      case ScoreboardSettingsType.Bench:
         state.applicationState.benchPressScoreboardSettings = params.scoreboardSettings
         break
-      case 'deadlift':
+      case ScoreboardSettingsType.Deadlift:
+        state.applicationState.deadliftScoreboardSettings = params.scoreboardSettings
+        break
+      case ScoreboardSettingsType.All:
+        state.applicationState.overallScoreboardSettings = params.scoreboardSettings
+        state.applicationState.squatScoreboardSettings = params.scoreboardSettings
+        state.applicationState.benchPressScoreboardSettings = params.scoreboardSettings
         state.applicationState.deadliftScoreboardSettings = params.scoreboardSettings
         break
     }
