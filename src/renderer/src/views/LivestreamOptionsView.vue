@@ -15,8 +15,14 @@ import defaultTemplate from '../../../../examples/templates/lower-thirds.mustach
 import Loading from 'vue-loading-overlay'
 import { ActiveAthleteCustomTemplate } from '../models/stream-data'
 import { AttemptStatus } from '../models/vportal'
-import { CompetitionGroup, ScoreboardType } from '../../../shared/models/state'
+import {
+  CompetitionGroup,
+  ScoreboardSettings,
+  ScoreboardSettingsType,
+  ScoreboardType
+} from '../../../shared/models/state'
 import { createClient } from '../vportal/client'
+import ScoreboardSettingsCard from '../components/ScoreboardSettingsCard.vue'
 
 const store = useStore()
 const router = useRouter()
@@ -28,29 +34,17 @@ const isLoading = ref<boolean>(false)
 let customLowerThirdsTemplate = defaultTemplate
 let interval: ReturnType<typeof setTimeout> | undefined = undefined
 
-const bgColor = ref(store.state.colorSettings.bgColor)
-
 const activeGroups = computed(() =>
   state.value.availableGroups.filter((group: CompetitionGroup) =>
     state.value.activeGroupIds.includes(group.id)
   )
 )
-const overallAvailablePages = computed(() =>
-  Array.from({ length: state.value.overallScoreboardSettings.availablePages }, (_, i) => i + 1)
-)
-const squatAvailablePages = computed(() =>
-  Array.from({ length: state.value.squatScoreboardSettings.availablePages }, (_, i) => i + 1)
-)
-const benchPressAvailablePages = computed(() =>
-  Array.from({ length: state.value.benchPressScoreboardSettings.availablePages }, (_, i) => i + 1)
-)
-const deadliftAvailablePages = computed(() =>
-  Array.from({ length: state.value.deadliftScoreboardSettings.availablePages }, (_, i) => i + 1)
-)
 
 const isMac = computed(() => {
   return window.util.getPlatform() === 'darwin'
 })
+
+const individualScoreboardControl = ref(false)
 
 async function handleFileUpload($event: Event) {
   const reader = new FileReader()
@@ -90,9 +84,29 @@ function fixedWindowFeatures(fixedWidth: number, fixedHeight: number) {
   return `width=${fixedWidth},minWidth=${fixedWidth},maxWidth=${fixedWidth},height=${fixedHeight},minHeight=${fixedHeight},maxHeight=${fixedHeight},nodeIntegration=no`
 }
 
-function refreshStateWithLoadingIndicator() {
+function logout() {
+  router.push('/logout')
+  window.credentials.clear()
+  window.util.closeAllWindowsExceptMain()
+}
+
+function updateScoreboardSettings(
+  scoreboardSettingsType: ScoreboardSettingsType,
+  scoreboardSettings: ScoreboardSettings
+) {
+  store.commit('setScoreboardSettings', {
+    scoreboardSettingsType: scoreboardSettingsType,
+    scoreboardSettings: scoreboardSettings
+  })
+}
+
+function updateScoreboardPageSize(
+  scoreboardSettingsType: ScoreboardSettingsType,
+  scoreboardSettings: ScoreboardSettings
+) {
   isLoading.value = true
-  refreshCompetitionData(gqlClient, state.value)
+  updateScoreboardSettings(scoreboardSettingsType, scoreboardSettings)
+  refreshCompetitionData(gqlClient, store.state.applicationState)
     .then((newState) => {
       store.commit('setApplicationState', newState)
       isLoading.value = false
@@ -101,36 +115,6 @@ function refreshStateWithLoadingIndicator() {
       toast.error('Error refreshing competition data')
       console.error(err)
     })
-}
-
-function logout() {
-  router.push('/logout')
-  window.credentials.clear()
-  window.util.closeAllWindowsExceptMain()
-}
-
-function updateScoreboardSettings(scoreboardType: string) {
-  let settings = undefined
-  switch (scoreboardType) {
-    case 'overall':
-      settings = state.value.overallScoreboardSettings
-      break
-    case 'squat':
-      settings = state.value.squatScoreboardSettings
-      break
-    case 'bench':
-      settings = state.value.benchPressScoreboardSettings
-      break
-    case 'deadlift':
-      settings = state.value.deadliftScoreboardSettings
-      break
-  }
-  if (settings) {
-    store.commit('setScoreboardSettings', {
-      scoreboardType: scoreboardType,
-      scoreboardSettings: settings
-    })
-  }
 }
 
 function updateSelectedScoreboardType() {
@@ -253,188 +237,120 @@ onBeforeMount(() => {
               </select>
             </div>
           </div>
-          <div class="flex flex-col w-96 p-4 m-4"></div>
+          <ScoreboardSettingsCard
+            :title="'Scoreboard'"
+            :scoreboard-settings-type="ScoreboardSettingsType.All"
+            @settings-update="
+              (payload) =>
+                updateScoreboardSettings(payload.scoreboardSettingsType, payload.scoreboardSettings)
+            "
+            @page-size-update="
+              (payload) =>
+                updateScoreboardPageSize(payload.scoreboardSettingsType, payload.scoreboardSettings)
+            "
+          />
         </div>
 
         <!-- Scoreboard Settings -->
-        <h2 class="text-xl text-white px-4">Scoreboard</h2>
+        <div class="flex flex-row justify-between w-full">
+          <label class="inline-flex items-center cursor-pointer">
+            <span class="mx-3 text-sm font-medium text-gray-300"
+              >Individual Scoreboard Control</span
+            >
+            <input
+              v-model="individualScoreboardControl"
+              type="checkbox"
+              value=""
+              class="sr-only peer"
+            />
+            <div
+              class="relative w-11 h-6 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-800 rounded-full peer bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-gray-600 peer-checked:bg-blue-600"
+            ></div>
+          </label>
+        </div>
+
         <div class="flex flex-col">
-          <div class="w-full flex flex-row justify-around">
-            <!-- Overall Scoreboard Settings -->
-            <div class="settings-card">
-              <h3>Overall</h3>
-              <div class="flex flex-row my-2">
-                <div class="mr-2">
-                  <select
-                    v-model="state.overallScoreboardSettings.selectedBodyWeightCategoryId"
-                    class="select"
-                    @change="updateScoreboardSettings('overall')"
-                  >
-                    <template v-for="group in state.availableGroups">
-                      <option
-                        v-for="category in group.bodyWeightCategories"
-                        :key="category.id"
-                        :value="category.id"
-                      >
-                        {{ category.name }} ({{ category.ageCategoryName }})
-                      </option>
-                    </template>
-                  </select>
-                </div>
-                <div class="mr-2 w-14">
-                  <select
-                    v-model="state.overallScoreboardSettings.page"
-                    class="select"
-                    @change="updateScoreboardSettings('overall')"
-                  >
-                    <option v-for="page in overallAvailablePages" :key="page" :value="page">
-                      {{ page }}
-                    </option>
-                  </select>
-                </div>
-                <div class="w-14">
-                  <input
-                    v-model="state.overallScoreboardSettings.pageSize"
-                    class="input"
-                    type="number"
-                    @change="refreshStateWithLoadingIndicator"
-                  />
-                </div>
-              </div>
+          <div v-if="individualScoreboardControl" class="flex flex-col">
+            <div class="w-full flex flex-row justify-around">
+              <!-- Overall Scoreboard Settings -->
+              <ScoreboardSettingsCard
+                :title="'Overall'"
+                :scoreboard-settings-type="ScoreboardSettingsType.Overall"
+                @settings-update="
+                  (payload) =>
+                    updateScoreboardSettings(
+                      payload.scoreboardSettingsType,
+                      payload.scoreboardSettings
+                    )
+                "
+                @page-size-update="
+                  (payload) =>
+                    updateScoreboardPageSize(
+                      payload.scoreboardSettingsType,
+                      payload.scoreboardSettings
+                    )
+                "
+              />
+              <ScoreboardSettingsCard
+                :title="'Squat'"
+                :scoreboard-settings-type="ScoreboardSettingsType.Squat"
+                @settings-update="
+                  (payload) =>
+                    updateScoreboardSettings(
+                      payload.scoreboardSettingsType,
+                      payload.scoreboardSettings
+                    )
+                "
+                @page-size-update="
+                  (payload) =>
+                    updateScoreboardPageSize(
+                      payload.scoreboardSettingsType,
+                      payload.scoreboardSettings
+                    )
+                "
+              />
             </div>
 
-            <!-- Squat Scoreboard Settings -->
-            <div class="settings-card">
-              <h3>Squat</h3>
-              <div class="flex flex-row my-2">
-                <div class="mr-2">
-                  <select
-                    v-model="state.squatScoreboardSettings.selectedBodyWeightCategoryId"
-                    class="select"
-                    @change="updateScoreboardSettings('squat')"
-                  >
-                    <template v-for="group in state.availableGroups">
-                      <option
-                        v-for="category in group.bodyWeightCategories"
-                        :key="category.id"
-                        :value="category.id"
-                      >
-                        {{ category.name }} ({{ category.ageCategoryName }})
-                      </option>
-                    </template>
-                  </select>
-                </div>
-                <div class="mr-2 w-14">
-                  <select
-                    id="squatPage"
-                    v-model="state.squatScoreboardSettings.page"
-                    class="select"
-                    @change="updateScoreboardSettings('squat')"
-                  >
-                    <option v-for="page in squatAvailablePages" :key="page" :value="page">
-                      {{ page }}
-                    </option>
-                  </select>
-                </div>
-                <div class="w-14">
-                  <input
-                    v-model="state.squatScoreboardSettings.pageSize"
-                    class="input"
-                    type="number"
-                    @change="refreshStateWithLoadingIndicator"
-                  />
-                </div>
-              </div>
+            <div class="w-full flex flex-row justify-around">
+              <ScoreboardSettingsCard
+                :title="'Bench'"
+                :scoreboard-settings-type="ScoreboardSettingsType.Bench"
+                @settings-update="
+                  (payload) =>
+                    updateScoreboardSettings(
+                      payload.scoreboardSettingsType,
+                      payload.scoreboardSettings
+                    )
+                "
+                @page-size-update="
+                  (payload) =>
+                    updateScoreboardPageSize(
+                      payload.scoreboardSettingsType,
+                      payload.scoreboardSettings
+                    )
+                "
+              />
+              <ScoreboardSettingsCard
+                :title="'Deadlift'"
+                :scoreboard-settings-type="ScoreboardSettingsType.Deadlift"
+                @settings-update="
+                  (payload) =>
+                    updateScoreboardSettings(
+                      payload.scoreboardSettingsType,
+                      payload.scoreboardSettings
+                    )
+                "
+                @page-size-update="
+                  (payload) =>
+                    updateScoreboardPageSize(
+                      payload.scoreboardSettingsType,
+                      payload.scoreboardSettings
+                    )
+                "
+              />
             </div>
           </div>
 
-          <div class="w-full flex flex-row justify-around">
-            <!-- Bench Scoreboard Settings -->
-            <div class="settings-card">
-              <h3>Bench Press</h3>
-              <div class="flex flex-row my-2">
-                <div class="mr-2">
-                  <select
-                    v-model="state.benchPressScoreboardSettings.selectedBodyWeightCategoryId"
-                    class="select"
-                  >
-                    <template v-for="group in state.availableGroups">
-                      <option
-                        v-for="category in group.bodyWeightCategories"
-                        :key="category.id"
-                        :value="category.id"
-                        @change="updateScoreboardSettings('bench')"
-                      >
-                        {{ category.name }} ({{ category.ageCategoryName }})
-                      </option>
-                    </template>
-                  </select>
-                </div>
-                <div class="mr-2 w-14">
-                  <select
-                    v-model="state.benchPressScoreboardSettings.page"
-                    class="select"
-                    @change="updateScoreboardSettings('bench')"
-                  >
-                    <option v-for="page in benchPressAvailablePages" :key="page" :value="page">
-                      {{ page }}
-                    </option>
-                  </select>
-                </div>
-                <div class="w-14">
-                  <input
-                    v-model="state.benchPressScoreboardSettings.pageSize"
-                    class="input"
-                    type="number"
-                    @change="refreshStateWithLoadingIndicator"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <!-- Deadlift Scoreboard Settings -->
-            <div class="settings-card">
-              <h3>Deadlift</h3>
-              <div class="flex flex-row my-2">
-                <div class="mr-2">
-                  <select
-                    v-model="state.deadliftScoreboardSettings.selectedBodyWeightCategoryId"
-                    class="select"
-                    @change="updateScoreboardSettings('deadlift')"
-                  >
-                    <template v-for="group in state.availableGroups">
-                      <option
-                        v-for="category in group.bodyWeightCategories"
-                        :key="category.id"
-                        :value="category.id"
-                      >
-                        {{ category.name }} ({{ category.ageCategoryName }})
-                      </option>
-                    </template>
-                  </select>
-                </div>
-                <div class="mr-2 w-14">
-                  <select
-                    v-model="state.deadliftScoreboardSettings.page"
-                    class="select"
-                    @change="updateScoreboardSettings('deadlift')"
-                  >
-                    <option v-for="page in deadliftAvailablePages" :key="page" :value="page">
-                      {{ page }}
-                    </option>
-                  </select>
-                </div>
-                <div class="w-14">
-                  <input
-                    v-model="state.deadliftScoreboardSettings.pageSize"
-                    class="input"
-                    type="number"
-                    @change="refreshStateWithLoadingIndicator"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
           <div class="w-full flex flex-row justify-around py-4">
             <div class="flex flex-col w-96 py-4">
               <button type="button" class="btn-secondary" @click="openLowerThirds">
@@ -475,10 +391,6 @@ onBeforeMount(() => {
 </template>
 
 <style scoped>
-.input {
-  @apply border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500;
-}
-
 .settings-card {
   @apply flex flex-col w-96 p-4 rounded-lg bg-gray-800 border border-gray-700 shadow-md m-4 text-gray-300;
 }

@@ -46,6 +46,14 @@ export const enum ScoreboardType {
   Deadlift = 'deadlift'
 }
 
+export const enum ScoreboardSettingsType {
+  Overall = 'overall',
+  Squat = 'squat',
+  Bench = 'bench',
+  Deadlift = 'deadlift',
+  All = 'all'
+}
+
 export interface BodyWeightCategory {
   id: string
   name: string
