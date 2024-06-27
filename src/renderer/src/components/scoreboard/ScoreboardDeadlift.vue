@@ -1,23 +1,25 @@
 <script setup lang="ts">
 import { onBeforeMount, onUnmounted, PropType, ref } from 'vue'
-import { SquatScoreboardEntry } from '../models/stream-data'
-import { AttemptStatus } from '../models/vportal'
-import { State } from '../../../shared/models/state'
+import { DeadliftScoreboardEntry } from '../../models/stream-data'
+import { AttemptStatus } from '../../models/vportal'
+import { getDeadliftScoreboard } from '../../vportal/stream-data'
+import { State } from '../../../../shared/models/state'
 import { GraphQLClient } from 'graphql-request'
-import { getSquatScoreboard } from '../vportal/stream-data'
 
 const props = defineProps({
   state: { type: Object as PropType<State>, required: true },
   gqlClient: { type: GraphQLClient, required: true }
 })
 
-const athletes = ref<Array<SquatScoreboardEntry>>(
+const athletes = ref<Array<DeadliftScoreboardEntry>>(
   Array(14).fill({
     name: '',
     lot: '',
     bodyWeight: '',
     total: '',
     prognosis: '',
+    bestSquat: '',
+    bestBench: '',
     attempt1: '',
     attempt2: '',
     attempt3: '',
@@ -34,7 +36,7 @@ let interval: ReturnType<typeof setTimeout> | undefined = undefined
 
 function getAthletes() {
   if (props.state.applicationState) {
-    getSquatScoreboard(props.gqlClient, props.state.applicationState).then((res) => {
+    getDeadliftScoreboard(props.gqlClient, props.state.applicationState).then((res) => {
       athletes.value = res
     })
   }
@@ -61,9 +63,11 @@ onUnmounted(() => {
           <div class="mx-1 flex items-center flex-row justify-start w-96">Name</div>
         </div>
         <div class="flex flex-row justify-end w-2/5">
-          <div class="px-2 flex flex-row items-center justify-center w-16">KB1</div>
-          <div class="px-2 flex flex-row items-center justify-center w-16">KB2</div>
-          <div class="px-2 flex flex-row items-center justify-center w-16">KB3</div>
+          <div class="px-2 flex flex-row items-center justify-center w-16">KB</div>
+          <div class="px-2 flex flex-row items-center justify-center w-16">BD</div>
+          <div class="px-2 flex flex-row items-center justify-center w-16">KH1</div>
+          <div class="px-2 flex flex-row items-center justify-center w-16">KH2</div>
+          <div class="px-2 flex flex-row items-center justify-center w-16">KH3</div>
         </div>
       </div>
       <div class="flex flex-row justify-end w-36 items-center">
@@ -79,8 +83,8 @@ onUnmounted(() => {
     class="flex flex-col w-full h-8 even:bg-gray-700 odd:bg-gray-500 opacity-80"
   >
     <div class="flex flex-row w-full h-full px-2 justify-between text-white items-center">
-      <div class="flex flex-row justify-between w-4/5 h-full items-center">
-        <div class="flex flex-row justify-start w-3/4 h-full items-center">
+      <div class="flex flex-row justify-between w-5/6 h-full items-center">
+        <div class="flex flex-row justify-start w-3/5 h-full items-center">
           <div v-if="athlete.name" class="mx-1 flex flex-row justify-center w-6">
             {{ idx + 1 }}
           </div>
@@ -95,7 +99,13 @@ onUnmounted(() => {
             {{ athlete.name }}
           </div>
         </div>
-        <div class="flex flex-row justify-end w-1/4 h-full items-center">
+        <div class="flex flex-row justify-end w-2/5 h-full items-center">
+          <div class="px-2 flex flex-row h-full items-center justify-center w-16">
+            {{ athlete.bestSquat }}
+          </div>
+          <div class="px-2 flex flex-row h-full items-center justify-center w-16">
+            {{ athlete.bestBench }}
+          </div>
           <div
             class="px-2 flex flex-row h-full items-center justify-center w-16"
             :class="{

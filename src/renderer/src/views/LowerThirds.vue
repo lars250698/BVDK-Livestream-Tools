@@ -6,7 +6,7 @@ import { useStore } from 'vuex'
 import { GraphQLClient } from 'graphql-request'
 import { getActiveAthlete } from '../vportal/stream-data'
 import { ensureClient } from '../util/state'
-import TransparentWindowControls from '../components/TransparentWindowControls.vue'
+import TransparentWindowControls from '../components/util/TransparentWindowControls.vue'
 
 const store = useStore()
 const gqlClient: Ref<GraphQLClient | undefined> = ref(undefined)

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { onBeforeMount, onUnmounted, PropType, ref } from 'vue'
-import { BenchScoreboardEntry } from '../models/stream-data'
-import { AttemptStatus } from '../models/vportal'
-import { State } from '../../../shared/models/state'
+import { BenchScoreboardEntry } from '../../models/stream-data'
+import { AttemptStatus } from '../../models/vportal'
+import { State } from '../../../../shared/models/state'
 import { GraphQLClient } from 'graphql-request'
-import { getBenchScoreboard } from '../vportal/stream-data'
+import { getBenchScoreboard } from '../../vportal/stream-data'
 
 const props = defineProps({
   state: { type: Object as PropType<State>, required: true },

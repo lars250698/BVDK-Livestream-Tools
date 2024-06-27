@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { State } from '../../../shared/models/state'
+import { State } from '../../../../shared/models/state'
 import { GraphQLClient } from 'graphql-request'
 import { onBeforeMount, onUnmounted, PropType, ref } from 'vue'
-import { OverallScoreboardEntry } from '../models/stream-data'
-import { getOverallScoreboard } from '../vportal/stream-data'
+import { OverallScoreboardEntry } from '../../models/stream-data'
+import { getOverallScoreboard } from '../../vportal/stream-data'
 
 const props = defineProps({
   state: { type: Object as PropType<State>, required: true },

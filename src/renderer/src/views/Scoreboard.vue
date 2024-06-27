@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import ScoreboardOverall from '../components/ScoreboardOverall.vue'
+import ScoreboardOverall from '../components/scoreboard/ScoreboardOverall.vue'
 import { useStore } from 'vuex'
 import { onMounted, Ref, ref } from 'vue'
 import { GraphQLClient } from 'graphql-request'
-import ScoreboardSquat from '../components/ScoreboardSquat.vue'
-import ScoreboardBench from '../components/ScoreboardBench.vue'
-import ScoreboardDeadlift from '../components/ScoreboardDeadlift.vue'
+import ScoreboardSquat from '../components/scoreboard/ScoreboardSquat.vue'
+import ScoreboardBench from '../components/scoreboard/ScoreboardBench.vue'
+import ScoreboardDeadlift from '../components/scoreboard/ScoreboardDeadlift.vue'
 import { ScoreboardType } from '../../../shared/models/state'
 import { ensureClient } from '../util/state'
-import TransparentWindowControls from '../components/TransparentWindowControls.vue'
+import TransparentWindowControls from '../components/util/TransparentWindowControls.vue'
 
 const store = useStore()
 const gqlClient: Ref<GraphQLClient | undefined> = ref(undefined)
