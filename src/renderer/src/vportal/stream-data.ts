@@ -279,7 +279,8 @@ async function getActiveAthlete(
     attemptColor3: colorInvisible,
     attemptStatus1: AttemptStatus.Open,
     attemptStatus2: AttemptStatus.Open,
-    attemptStatus3: AttemptStatus.Open
+    attemptStatus3: AttemptStatus.Open,
+    activeAttempt: 0
   }
   const groups = await activeGroupsOnStage(
     client,
@@ -321,7 +322,8 @@ async function getActiveAthlete(
       attemptColor3: getAttemptColor(attempts[2].status),
       attemptStatus1: attempts[0].status,
       attemptStatus2: attempts[1].status,
-      attemptStatus3: attempts[2].status
+      attemptStatus3: attempts[2].status,
+      activeAttempt: activeAttempt.attempt
     }
   }
   return empty

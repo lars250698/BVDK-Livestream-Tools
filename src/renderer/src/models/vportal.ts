@@ -49,6 +49,7 @@ export interface ActiveAthleteQueryResult {
       | [
           {
             discipline: Discipline
+            attempt: number
             competitionAthlete: CompetitionAthlete
           }
         ]
