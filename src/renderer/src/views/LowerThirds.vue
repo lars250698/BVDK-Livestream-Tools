@@ -30,7 +30,8 @@ const athlete = ref<ActiveAthlete>({
   attemptColor3: '',
   attemptStatus1: AttemptStatus.Open,
   attemptStatus2: AttemptStatus.Open,
-  attemptStatus3: AttemptStatus.Open
+  attemptStatus3: AttemptStatus.Open,
+  activeAttempt: 0
 })
 
 let interval: ReturnType<typeof setTimeout> | undefined = undefined

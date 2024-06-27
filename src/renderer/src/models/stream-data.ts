@@ -54,6 +54,7 @@ export interface ActiveAthlete {
   attemptStatus1: AttemptStatus
   attemptStatus2: AttemptStatus
   attemptStatus3: AttemptStatus
+  activeAttempt: number
 }
 
 export interface ActiveAthleteCustomTemplate extends ActiveAthlete {
