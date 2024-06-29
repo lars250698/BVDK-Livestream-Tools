@@ -72,8 +72,8 @@ onUnmounted(() => {
     class="flex flex-col w-full h-8 even:bg-gray-700 odd:bg-gray-500 opacity-80"
   >
     <div class="flex flex-row w-full h-full px-2 justify-between text-white items-center">
-      <div class="flex flex-row justify-between w-4/5">
-        <div class="flex flex-row justify-start w-3/4">
+      <div class="flex flex-row justify-between w-5/6">
+        <div class="flex flex-row justify-start w-3/5">
           <div v-if="athlete.name" class="mx-1 flex flex-row justify-center w-6">
             {{ idx + 1 }}
           </div>
@@ -82,13 +82,13 @@ onUnmounted(() => {
           <div class="mx-1 flex flex-row justify-center w-10">{{ athlete.lot }}</div>
           <div class="mx-1 flex flex-row justify-start w-96">{{ athlete.name }}</div>
         </div>
-        <div class="flex flex-row justify-end w-1/4">
+        <div class="flex flex-row justify-end w-2/5">
           <div class="mx-2 flex flex-row justify-center w-16">{{ athlete.bestSquat }}</div>
           <div class="mx-2 flex flex-row justify-center w-16">{{ athlete.bestBench }}</div>
           <div class="mx-2 flex flex-row justify-center w-16">{{ athlete.bestDeadlift }}</div>
         </div>
       </div>
-      <div class="flex flex-row justify-end w-48 items-center">
+      <div class="flex flex-row justify-end w-36 items-center">
         <div class="mr-2 flex flex-row justify-center w-16">{{ athlete.total }}</div>
         <div class="ml-2 flex flex-row justify-center w-16">{{ athlete.prognosis }}</div>
       </div>
